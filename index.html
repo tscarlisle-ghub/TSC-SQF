@@ -142,9 +142,11 @@
   }
   .config-cell .label-line {
     font-family: var(--sans);
-    font-size: 10px; text-transform: uppercase;
-    letter-spacing: 0.16em; color: var(--ink-faint);
-    margin-bottom: 5px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 6px;
   }
 
   .stepper, .segmented {
@@ -179,16 +181,16 @@
   .segmented button:hover { color: var(--ink); }
   .segmented button.active { background: var(--btn-active); color: var(--ink); }
 
-  /* Vertical text-list variant for material selections — no boxes, just stacked
-     options. Bold + accent color on the selected one. */
+  /* Vertical text-list for material selections — no boxes, just stacked
+     options. Bold + accent on the selected one. */
   .segmented.text-list {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     border: none;
     background: transparent;
     overflow: visible;
-    gap: 4px;
+    gap: 6px;
   }
   .segmented.text-list button {
     border: none;
@@ -208,6 +210,26 @@
     background: transparent;
     color: var(--accent);
     font-weight: 700;
+  }
+  .segmented.text-list .opt-desc {
+    display: block;
+    font-family: var(--serif); font-style: italic;
+    font-size: 12px; font-weight: 400;
+    color: var(--ink-faint);
+    margin-top: 1px;
+    line-height: 1.35;
+  }
+  .segmented.text-list button.active .opt-desc {
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+
+  /* Materials &amp; Finishes section uses an explicit 2-column grid */
+  .config-bar.materials-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 700px) {
+    .config-bar.materials-bar { grid-template-columns: 1fr; }
   }
 
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -253,10 +275,10 @@
     padding-top: 8px; margin-top: 4px; font-weight: 500;
   }
   .stat-row .k {
-    font-family: var(--serif); font-size: 14px;
+    font-family: var(--serif); font-size: 17px;
   }
   .stat-row .k .sub {
-    font-family: var(--sans); font-size: 10px;
+    font-family: var(--sans); font-size: 12px;
     color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: 0.14em; margin-left: 6px;
   }
@@ -274,61 +296,56 @@
     width: 100%; border-collapse: collapse;
     font-family: var(--serif);
   }
+  /* Tier table — condensed font throughout, slightly larger sizes */
   table.tiers th {
-    font-family: var(--sans); font-size: 9px; font-weight: 500;
+    font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
+    font-size: 13px; font-weight: 500;
     text-transform: uppercase; letter-spacing: 0.18em;
     color: var(--ink-faint); padding: 4px 6px; text-align: right;
     border-bottom: 1px solid var(--rule);
   }
   table.tiers th:first-child { text-align: left; }
   table.tiers td {
-    padding: 8px 6px;
+    padding: 10px 6px;
     border-bottom: 1px solid var(--rule-faint);
     vertical-align: baseline;
+    font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
+    font-feature-settings: "tnum";
   }
   table.tiers td.tier-name {
-    font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 21px;
+    font-size: 28px;
     letter-spacing: 0.04em;
     line-height: 1.05;
     padding-right: 14px;
     text-align: left;
     text-transform: uppercase;
   }
-  table.tiers td.tier-name .sub {
-    display: block;
-    font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 11px;
-    color: var(--ink-faint);
-    text-transform: none;
-    letter-spacing: 0.02em;
-    margin-top: 4px;
-    text-align: left;
-  }
   table.tiers td.range, table.tiers td.psf, table.tiers td.total {
-    text-align: right; font-family: var(--mono);
-    font-feature-settings: "tnum"; white-space: nowrap;
+    text-align: right; font-feature-settings: "tnum"; white-space: nowrap;
   }
   table.tiers td.psf {
     text-align: left;
-    font-size: 13px;
+    font-size: 18px;
     color: var(--ink);
-    line-height: 1.35;
+    line-height: 1.3;
+    font-weight: 500;
   }
   table.tiers td.psf .label  {
-    font-family: var(--sans); font-size: 9px;
+    font-family: var(--sans); font-size: 13px;
+    font-weight: 500;
     color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: 0.14em; margin-left: 4px;
   }
   table.tiers td.psf .cond {
-    display: block; font-size: 11px; color: var(--ink-mute); margin-top: 2px;
+    display: block; font-size: 15px; color: var(--ink-mute); margin-top: 2px; font-weight: 400;
   }
-  table.tiers td.range { font-size: 13px; color: var(--ink-mute); }
-  table.tiers td.total { font-size: 14px; color: var(--ink); }
+  table.tiers td.range { font-size: 18px; color: var(--ink-mute); font-weight: 500; }
+  table.tiers td.total { font-size: 21px; color: var(--ink);     font-weight: 500; }
+  /* Selected tier row — bold every cell */
+  table.tiers tr.selected td { font-weight: 700; }
+  table.tiers tr.selected td.tier-name { font-weight: 600; }  /* condensed already heavy at 600 */
   table.tiers tr.selected td {
     background: var(--highlight);
     border-bottom-color: var(--tier-accent-mute);
@@ -370,7 +387,7 @@
     border-top: 1px solid var(--ink);
   }
   .grand-total .k {
-    font-family: var(--sans); font-size: 10px;
+    font-family: var(--sans); font-size: 12px;
     text-transform: uppercase; letter-spacing: 0.18em;
     color: var(--ink-mute);
   }
@@ -378,6 +395,11 @@
     font-family: var(--mono); font-size: 24px;
     color: var(--tier-accent); font-feature-settings: "tnum";
     margin-top: 2px;
+  }
+  .grand-total .v-sub {
+    font-family: var(--serif); font-style: italic;
+    font-size: 16px; color: var(--ink-mute);
+    margin-top: 6px;
   }
 
   /* ---------- Rooms ---------- */
@@ -413,7 +435,7 @@
   .rooms-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    column-gap: 36px;
+    column-gap: 64px;
     row-gap: 0;
     margin-top: 4px;
   }
@@ -487,24 +509,30 @@
   }
 
   .add-row {
-    margin-top: 10px; padding: 6px 0;
-    font-family: var(--sans); font-size: 11px;
+    margin-top: 14px; padding: 8px 0;
+    font-family: var(--sans); font-size: 13px;
     color: var(--ink-mute);
-    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
   }
   .add-row select, .add-row button {
-    font-family: var(--sans); font-size: 11px;
-    padding: 4px 8px; background: #fff;
+    font-family: var(--sans); font-size: 13px;
+    padding: 6px 12px; background: #fff;
     border: 1px solid var(--rule);
     color: var(--ink-mute); cursor: pointer;
   }
   .add-row button:hover { color: var(--ink); border-color: var(--ink-faint); }
 
   .del-btn {
-    background: transparent; border: none;
-    color: var(--ink-faint); cursor: pointer;
-    font-family: var(--mono); font-size: 14px;
-    padding: 2px 4px;
+    background: transparent; border: none; cursor: pointer;
+    font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    padding: 0;
+    margin-left: 10px;
+    vertical-align: middle;
   }
   .del-btn:hover { color: var(--accent); }
 
@@ -560,10 +588,11 @@
     </div>
 
     <div class="config-cell">
-      <div class="label-line">Levels</div>
+      <div class="label-line">Levels &amp; site</div>
       <div class="chips" id="modChips">
         <label class="chip"><input type="checkbox" data-mod="twoStory"> Two-story</label>
         <label class="chip"><input type="checkbox" data-mod="basement"> Basement</label>
+        <label class="chip"><input type="checkbox" data-mod="pool"> Pool</label>
       </div>
     </div>
 
@@ -580,7 +609,7 @@
       <div class="label-line">Finish level</div>
       <div class="segmented" id="finishSeg">
         <button data-tier="normal"  class="active">Normally Nice</button>
-        <button data-tier="high">High</button>
+        <button data-tier="high">Elevated</button>
         <button data-tier="veryHigh">Very High</button>
       </div>
     </div>
@@ -589,16 +618,14 @@
 
   <!-- ===================== MATERIALS & FINISHES ===================== -->
   <h2 class="section">Materials &amp; Finishes</h2>
-  <div class="config-bar">
+  <div class="config-bar materials-bar">
 
     <div class="config-cell">
       <div class="label-line">Exterior walls</div>
       <div class="segmented text-list" id="wallSeg">
-        <button data-mat="painted">Painted brick</button>
-        <button data-mat="siding">Wood siding</button>
-        <button data-mat="brick" class="active">Brick</button>
-        <button data-mat="reclaimed">Reclaimed brick</button>
-        <button data-mat="stone">Stone</button>
+        <button data-mat="normal" class="active">Normal<span class="opt-desc">mix of brick or painted brick and wood siding</span></button>
+        <button data-mat="elevated">Elevated<span class="opt-desc">mix of reclaimed brick, some stone, and wood siding</span></button>
+        <button data-mat="veryHigh">Very High<span class="opt-desc">mostly stone and reclaimed brick, limited wood siding</span></button>
       </div>
     </div>
 
@@ -616,7 +643,7 @@
       <div class="segmented text-list" id="interiorSeg">
         <button data-mat="normal" class="active">Normal</button>
         <button data-mat="elevated">Elevated</button>
-        <button data-mat="custom">Custom</button>
+        <button data-mat="veryHigh">Very High</button>
       </div>
     </div>
 
@@ -624,8 +651,17 @@
       <div class="label-line">Cabinetry &amp; millwork</div>
       <div class="segmented text-list" id="cabSeg">
         <button data-mat="normal" class="active">Normal</button>
-        <button data-mat="semi">Semi-custom</button>
-        <button data-mat="full">Fully custom</button>
+        <button data-mat="elevated">Elevated</button>
+        <button data-mat="veryHigh">Very High</button>
+      </div>
+    </div>
+
+    <div class="config-cell">
+      <div class="label-line">Landscape</div>
+      <div class="segmented text-list" id="landSeg">
+        <button data-land="normal" class="active">Normal</button>
+        <button data-land="elevated">Elevated</button>
+        <button data-land="veryHigh">Very High</button>
       </div>
     </div>
 
@@ -682,8 +718,9 @@
         </table>
 
         <div class="grand-total">
-          <div class="k">Selected — <span id="selTierName">Normal</span></div>
+          <div class="k">Selected &mdash; <span id="selTierName">Normally Nice</span></div>
           <div class="v" id="grandTotal">$0 &ndash; $0</div>
+          <div class="v-sub" id="selTierSub"></div>
         </div>
       </div>
 
@@ -714,7 +751,7 @@
    ==================================================================== */
 const TIERS = {
   normal:   { label: "Normally Nice", sub: "Asphalt + standard finishes",     loUR: 315, hiUR: 345 },
-  high:     { label: "High",          sub: "Cedar shake + nice finishes",     loUR: 350, hiUR: 390 },
+  high:     { label: "Elevated",      sub: "Cedar shake + nice finishes",     loUR: 350, hiUR: 390 },
   veryHigh: { label: "Very High",     sub: "Slate or premium cedar + custom", loUR: 420, hiUR: 465 }
 };
 
@@ -723,11 +760,9 @@ const MATERIALS = {
   walls: {
     label: "Exterior walls",
     options: {
-      painted:   { label: "Painted brick",   psf: -3,  note: "utility brick + paint" },
-      siding:    { label: "Wood siding",     psf: -5,  note: "lower coursing labor" },
-      brick:     { label: "Brick",           psf:  0,  note: "baseline face brick" },
-      reclaimed: { label: "Reclaimed brick", psf:  6,  note: "premium reclaimed + slow labor" },
-      stone:     { label: "Stone",           psf: 14,  note: "full stone veneer" }
+      normal:   { label: "Normal",    psf:  0, note: "mix of brick or painted brick and wood siding" },
+      elevated: { label: "Elevated",  psf:  6, note: "mix of reclaimed brick, some stone, and wood siding" },
+      veryHigh: { label: "Very High", psf: 14, note: "mostly stone and reclaimed brick, limited wood siding" }
     }
   },
   roof: {
@@ -741,17 +776,17 @@ const MATERIALS = {
   interior: {
     label: "Interior finish",
     options: {
-      normal:   { label: "Normal",    psf:  0, note: "trim grade paint, mid tile, hardwood" },
-      elevated: { label: "Elevated",  psf: 15, note: "premium tile, painted millwork, upgraded fixtures" },
-      custom:   { label: "Custom",    psf: 35, note: "specialty stone, custom millwork, designer fixtures" }
+      normal:   { label: "Normal",     psf:  0, note: "trim grade paint, mid tile, hardwood" },
+      elevated: { label: "Elevated",   psf: 15, note: "premium tile, painted millwork, upgraded fixtures" },
+      veryHigh: { label: "Very High",  psf: 35, note: "specialty stone, designer fixtures, custom finishes" }
     }
   },
   cabinets: {
     label: "Cabinetry & millwork",
     options: {
-      normal:   { label: "Normal",       psf:  0, note: "stock to semi-stock cabinets" },
-      semi:     { label: "Semi-custom",  psf: 10, note: "semi-custom cabinets, painted built-ins" },
-      full:     { label: "Fully custom", psf: 25, note: "shop-built custom cabinets + millwork" }
+      normal:   { label: "Normal",     psf:  0, note: "stock to semi-stock cabinets" },
+      elevated: { label: "Elevated",   psf: 10, note: "semi-custom cabinets, painted built-ins" },
+      veryHigh: { label: "Very High",  psf: 25, note: "shop-built custom cabinets + millwork" }
     }
   }
 };
@@ -761,6 +796,24 @@ const STEEP_TIERS = {
   none:    { label: "Flat / mild", pct: 0.00 },
   sloping: { label: "Sloping",     pct: 0.04 },
   steep:   { label: "Steep",       pct: 0.08 }
+};
+
+// Landscape — flat dollar amounts, NOT subject to the steep-site surcharge.
+// Normal is always added (the $60k baseline); steps go up by 50% each level.
+const LANDSCAPE_TIERS = {
+  normal:   { label: "Normal",    dollars:  60000 },
+  elevated: { label: "Elevated",  dollars:  90000 },
+  veryHigh: { label: "Very High", dollars: 135000 }
+};
+
+// Pool — flat add when toggled on
+const POOL_DOLLARS = 120000;
+
+// Garage car-count → fixed footprint
+const GARAGE_BY_CAR = {
+  1: { w: 12, l: 24, label: "1 car" },
+  2: { w: 24, l: 24, label: "2 car" },
+  3: { w: 36, l: 24, label: "3 car" }
 };
 
 /* ====================================================================
@@ -799,17 +852,19 @@ const TPL = {
   bath:         { name: "Bath",                  w: 5,    l: 10,   minW: 4,   minL: 7,   group: "floor1" },
   closet:       { name: "Closet",                w: 5,    l: 5,    minW: 4,   minL: 4,   group: "floor1" },
 
-  // Stairs — SAMPLE 5'×18' = 90 sf, may grow up to 5%
-  stairUp:      { name: "Stair to 2nd Floor",    w: STAIR.w, l: STAIR.l, minW: 5, minL: 18, group: "floor1", isStair: true },
-  stairDown:    { name: "Stair to Basement",     w: STAIR.w, l: STAIR.l, minW: 5, minL: 18, group: "floor1", isStair: true },
+  // Stairs — single stair entry regardless of whether you're going up, down, or
+  // both. SAMPLE 5'×18' = 90 sf; may grow up to 5%.
+  stair:        { name: "Stairs",                w: STAIR.w, l: STAIR.l, minW: 5, minL: 18, group: "floor1", isStair: true },
 
   // Basement — SAMPLE: STORAGE 30×30=900, MEDIA 16×16=256, basement gross 1,156
   bsmtMedia:    { name: "Media Room",            w: 16,   l: 16,   minW: 10,  minL: 12,  group: "basement" },
   bsmtStorage:  { name: "Storage",               w: 30,   l: 30,   minW: 8,   minL: 10,  group: "basement", conditioned: false },
   bsmtMech:     { name: "Mechanical",            w: 8,    l: 10,   minW: 6,   minL: 8,   group: "basement", conditioned: false },
 
-  // Unheated — SAMPLE: GARAGE 24×24, PORCHES 20×24=480 (split front/rear here)
-  garage:       { name: "Garage",                w: 24,   l: 24,   minW: 18,  minL: 20,  group: "unheated", conditioned: false },
+  // Unheated — SAMPLE: GARAGE 24×24 (now driven by car-count selector),
+  // PORCHES 20×24=480 (split front/rear here)
+  garage:       { name: "Garage",                w: 24,   l: 24,   minW: 12,  minL: 20,  group: "unheated", conditioned: false, isGarage: true },
+  garageStorage:{ name: "Garage Storage",        w: 8,    l: 10,   minW: 4,   minL: 4,   group: "unheated", conditioned: false },
   frontPorch:   { name: "Front Porch",           w: 10,   l: 20,   minW: 5,   minL: 8,   group: "unheated", conditioned: false },
   rearPorch:    { name: "Rear Porch",            w: 14,   l: 20,   minW: 6,   minL: 8,   group: "unheated", conditioned: false },
 
@@ -854,11 +909,13 @@ const ADD_PALETTE = {
    ==================================================================== */
 const state = {
   bedrooms: 4,
-  modifiers: { twoStory: false, basement: false },
-  steepSite:  "none",     // none / sloping / steep
-  finishTier: "normal",
+  modifiers: { twoStory: false, basement: false, pool: false },
+  steepSite:   "none",     // none / sloping / steep
+  garageCars:  2,          // 1 / 2 / 3
+  landscape:   "normal",   // normal / elevated / veryHigh
+  finishTier:  "normal",
   materials:  {
-    walls:    "brick",
+    walls:    "normal",
     roof:     "asphalt",
     interior: "normal",
     cabinets: "normal"
@@ -924,9 +981,10 @@ function buildRoomList() {
     addRoom("closet",  "floor1", null, "down", null, downstairs);
   }
 
-  // Stairs — only if twoStory or basement
-  if (state.modifiers.twoStory) addRoom("stairUp",   "floor1");
-  if (state.modifiers.basement) addRoom("stairDown", "floor1");
+  // Stairs — single entry; included if either twoStory or basement is on
+  if (state.modifiers.twoStory || state.modifiers.basement) {
+    addRoom("stair", "floor1");
+  }
 
   // 2nd floor — sitting room + playroom, then uniform bedroom/bath/closet × N
   if (state.modifiers.twoStory) {
@@ -946,10 +1004,11 @@ function buildRoomList() {
     addRoom("bsmtMech",    "basement");
   }
 
-  // Unheated under-roof
-  addRoom("garage",     "unheated");
-  addRoom("frontPorch", "unheated");
-  addRoom("rearPorch",  "unheated");
+  // Unheated under-roof — garage size comes from state.garageCars
+  addRoom("garage",        "unheated");
+  addRoom("garageStorage", "unheated");
+  addRoom("frontPorch",    "unheated");
+  addRoom("rearPorch",     "unheated");
 
   // Restore prior W/L customizations (count is rebuilt fresh)
   state.rooms.forEach(r => {
@@ -994,7 +1053,17 @@ function addRoom(tplKey, groupOverride, idOverride, tplIndex, nameSuffix, count)
 function addUserRoom(tplKey, group) {
   const tpl = TPL[tplKey];
   if (!tpl) return;
-  // Give a unique tplIndex so it never collides with the default-room dedup key
+  // If the user is re-adding a previously deleted default singleton, restore it
+  // as a default rather than as a duplicate user-added room.
+  const dKey = tplKey + ":x:" + group;
+  if (state.deletedKeys.has(dKey)) {
+    state.deletedKeys.delete(dKey);
+    buildRoomList();
+    render();
+    saveState();
+    return;
+  }
+  // Fresh user-added room — give it a unique tplIndex so it never collides
   const uniqueIdx = "u" + Date.now() + "-" + Math.floor(Math.random() * 999);
   const r = addRoom(tplKey, group, null, uniqueIdx);
   if (!r) return;
@@ -1083,6 +1152,14 @@ function render() {
   renderRooms();
 }
 
+function fixedAdjustments() {
+  let sum = 0;
+  if (state.modifiers && state.modifiers.pool) sum += POOL_DOLLARS;
+  const lkey = state.landscape || "normal";
+  sum += LANDSCAPE_TIERS[lkey].dollars;
+  return sum;
+}
+
 function renderSummary() {
   const t = totals();
 
@@ -1092,19 +1169,20 @@ function renderSummary() {
   document.getElementById("unc").textContent       = fmtSF(t.unc);
   document.getElementById("urTotal").textContent   = fmtSF(t.urTotal);
 
-  // Total adjustments — materials (per-sf) and steep-site (% surcharge)
-  const matSum = materialAdjustmentSum(t.urTotal);
-  const steep  = steepPct();
+  // Adjustments
+  const matSum   = materialAdjustmentSum(t.urTotal);
+  const steep    = steepPct();
+  const fixedAdj = fixedAdjustments();    // pool + landscape, NOT subject to steep
 
-  // Tier table — under-roof $/sf primary, conditioned $/sf derived in parens.
-  // Clicking a tier row selects that tier (same as clicking the segmented control).
+  // Tier table — descriptors are NOT shown in the rows; they appear under
+  // the grand total instead. Clicking any row selects that tier.
   const tbody = document.getElementById("tiersBody");
   tbody.innerHTML = "";
   for (const key of ["normal","high","veryHigh"]) {
     const ti = TIERS[key];
     const base = tierBaseRange(key, t.urTotal);
-    let totLo = (base.lo + matSum) * (1 + steep);
-    let totHi = (base.hi + matSum) * (1 + steep);
+    let totLo = (base.lo + matSum) * (1 + steep) + fixedAdj;
+    let totHi = (base.hi + matSum) * (1 + steep) + fixedAdj;
     const psfHCLo = (t.hcNet > 0) ? Math.round(base.lo / t.hcNet) : 0;
     const psfHCHi = (t.hcNet > 0) ? Math.round(base.hi / t.hcNet) : 0;
     const tr = document.createElement("tr");
@@ -1112,8 +1190,7 @@ function renderSummary() {
     tr.dataset.tier = key;
     if (key === state.finishTier) tr.className = "selected";
     tr.innerHTML =
-      "<td class=\"tier-name\"><span class=\"selected-marker\"></span>" + ti.label +
-        "<span class=\"sub\">" + ti.sub + "</span></td>" +
+      "<td class=\"tier-name\"><span class=\"selected-marker\"></span>" + ti.label + "</td>" +
       "<td class=\"psf\">" +
         "<span>$" + ti.loUR + "&ndash;$" + ti.hiUR + "</span><span class=\"label\">Under roof</span>" +
         "<span class=\"cond\">($" + psfHCLo + "&ndash;$" + psfHCHi + " conditioned)</span>" +
@@ -1122,7 +1199,6 @@ function renderSummary() {
       "<td class=\"total\">" + fmt$M(totLo) + " &ndash; " + fmt$M(totHi) + "</td>";
     tr.addEventListener("click", () => {
       state.finishTier = key;
-      // Sync the Finish-level segmented buttons too
       document.querySelectorAll("#finishSeg button").forEach(b => {
         b.classList.toggle("active", b.dataset.tier === key);
       });
@@ -1132,12 +1208,13 @@ function renderSummary() {
     tbody.appendChild(tr);
   }
 
-  // Grand total — selected tier with materials and steep surcharge folded in
+  // Grand total — selected tier with materials, steep, pool + landscape folded in
   const baseSel = tierBaseRange(state.finishTier, t.urTotal);
-  const totLoSel = (baseSel.lo + matSum) * (1 + steep);
-  const totHiSel = (baseSel.hi + matSum) * (1 + steep);
+  const totLoSel = (baseSel.lo + matSum) * (1 + steep) + fixedAdj;
+  const totHiSel = (baseSel.hi + matSum) * (1 + steep) + fixedAdj;
   document.getElementById("selTierName").textContent = TIERS[state.finishTier].label;
   document.getElementById("grandTotal").innerHTML = fmt$M(totLoSel) + "  &ndash;  " + fmt$M(totHiSel);
+  document.getElementById("selTierSub").textContent = TIERS[state.finishTier].sub;
 }
 
 function renderRooms() {
@@ -1185,9 +1262,26 @@ function renderRooms() {
     layout.appendChild(sec);
 
     if (ADD_PALETTE[fdef.id]) {
+      const baseOpts = ADD_PALETTE[fdef.id] || [];
+      // Also surface any deleted DEFAULT singletons for this floor so the
+      // user can put them back. Excludes count-multiplier and special rows.
+      const excludeFromRecover = new Set(["bedroom","bath","closet","stair","stairUp","stairDown","garage","garageStorage"]);
+      const recoverable = [];
+      state.deletedKeys.forEach(dKey => {
+        const parts = (dKey || "").split(":");
+        const tplKey = parts[0], idx = parts[1], group = parts[2];
+        if (group !== fdef.id) return;
+        if (idx !== "x")        return;     // only singleton defaults
+        if (excludeFromRecover.has(tplKey)) return;
+        if (!TPL[tplKey])       return;
+        if (baseOpts.indexOf(tplKey)   !== -1) return;
+        if (recoverable.indexOf(tplKey) !== -1) return;
+        recoverable.push(tplKey);
+      });
+      const palette = baseOpts.concat(recoverable);
       const addRow = document.createElement("div");
       addRow.className = "add-row";
-      const opts = ADD_PALETTE[fdef.id].map(k => {
+      const opts = palette.map(k => {
         const tp = TPL[k];
         return "<option value=\"" + k + "\">" + tp.name +
           " (" + fmtFt(tp.w) + " &times; " + fmtFt(tp.l) + ")</option>";
@@ -1214,6 +1308,36 @@ function renderRoomRow(grid, r) {
   div.className = "room-row" + (r.isStair ? " stair" : "");
   div.dataset.id = r.id;
 
+  // ----------------------------------------------------------------
+  // Special-case: Garage uses a 1/2/3-car selector instead of slider
+  // ----------------------------------------------------------------
+  if (r.tplKey === "garage") {
+    const g = GARAGE_BY_CAR[state.garageCars] || GARAGE_BY_CAR[2];
+    r.w = g.w; r.l = g.l;
+    const sf = r.w * r.l;
+    div.innerHTML =
+      "<div class=\"row-top\">" +
+        "<span class=\"name\">Garage</span>" +
+        "<span class=\"sf\">" + sf + " sf  &middot;  " + fmtFt(r.w) + " &times; " + fmtFt(r.l) + "</span>" +
+      "</div>" +
+      "<div class=\"row-bottom\" style=\"grid-template-columns:1fr;\">" +
+        "<div class=\"segmented\" style=\"max-width:240px;\">" +
+          "<button data-cars=\"1\"" + (state.garageCars===1?' class="active"':'') + ">1 car</button>" +
+          "<button data-cars=\"2\"" + (state.garageCars===2?' class="active"':'') + ">2 car</button>" +
+          "<button data-cars=\"3\"" + (state.garageCars===3?' class="active"':'') + ">3 car</button>" +
+        "</div>" +
+      "</div>";
+    grid.appendChild(div);
+    div.querySelectorAll("button[data-cars]").forEach(b => {
+      b.addEventListener("click", () => {
+        state.garageCars = +b.dataset.cars;
+        render();
+        saveState();
+      });
+    });
+    return;
+  }
+
   const count = r.count || 1;
   const sfEach  = Math.round(r.w * r.l);
   const sfTotal = sfEach * count;
@@ -1239,7 +1363,7 @@ function renderRoomRow(grid, r) {
     "<span class=\"count-tag\"> &times; " + count + "</span>" : "";
 
   const delBtn = r.removable ?
-    "<button class=\"del-btn del\" data-del=\"" + r.id + "\" title=\"Remove\">&times;</button>" : "";
+    "<button class=\"del-btn\" data-del=\"" + r.id + "\" title=\"Remove\">DELETE</button>" : "";
 
   // SF cell: when count > 1, show "504 sf  (168 each)"
   const sfDisplay = (count > 1)
@@ -1248,9 +1372,8 @@ function renderRoomRow(grid, r) {
 
   div.innerHTML =
     "<div class=\"row-top\">" +
-      "<span class=\"name\">" + r.name + countTag + unheatedTag + "</span>" +
+      "<span class=\"name\">" + r.name + countTag + unheatedTag + delBtn + "</span>" +
       "<span class=\"sf\">" + sfDisplay + "</span>" +
-      delBtn +
     "</div>" +
     "<div class=\"row-bottom\">" +
       "<div class=\"slider-cell\"><input type=\"range\" min=\"" + sliderMin + "\" max=\"" + sliderMax +
@@ -1322,6 +1445,12 @@ function renderRoomRow(grid, r) {
     syncRoomDisplay();
   }
 
+  // Auto-select all text on focus so users can immediately type a new dim
+  [wInput, lInput].forEach(inp => {
+    inp.addEventListener("focus", () => setTimeout(() => inp.select(), 0));
+    inp.addEventListener("click", () => inp.select());
+  });
+
   wInput.addEventListener("change", () => commitDim(wInput, "w"));
   wInput.addEventListener("blur",   () => commitDim(wInput, "w"));
   wInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commitDim(wInput, "w"); } });
@@ -1390,6 +1519,17 @@ function wireControls() {
       document.querySelectorAll("#steepSeg button").forEach(x => x.classList.remove("active"));
       b.classList.add("active");
       state.steepSite = b.dataset.mat;
+      renderSummary();
+      saveState();
+    });
+  });
+
+  // Landscape segmented (text-list)
+  document.querySelectorAll("#landSeg button").forEach(b => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#landSeg button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      state.landscape = b.dataset.land;
       renderSummary();
       saveState();
     });
@@ -1468,6 +1608,10 @@ function syncUIToState() {
   document.querySelectorAll("#steepSeg button").forEach(b => {
     b.classList.toggle("active", b.dataset.mat === (state.steepSite || "none"));
   });
+  // Landscape (uses data-land attribute)
+  document.querySelectorAll("#landSeg button").forEach(b => {
+    b.classList.toggle("active", b.dataset.land === (state.landscape || "normal"));
+  });
   // Material segments
   function setSeg(rootSel, cat) {
     document.querySelectorAll(rootSel + " button").forEach(b => {
@@ -1489,6 +1633,8 @@ function buildSnapshot() {
     bedrooms: state.bedrooms,
     modifiers: state.modifiers,
     steepSite: state.steepSite,
+    garageCars: state.garageCars,
+    landscape: state.landscape,
     finishTier: state.finishTier,
     materials: state.materials,
     rooms: state.rooms.map(r => ({
@@ -1535,10 +1681,16 @@ function saveState() {
 function applySnapshot(snap) {
   if (!snap || !snap.rooms) return false;
   state.bedrooms = snap.bedrooms ?? 4;
-  state.modifiers = Object.assign({ twoStory: false, basement: false }, snap.modifiers || {});
-  state.steepSite = snap.steepSite || "none";
+  state.modifiers = Object.assign({ twoStory: false, basement: false, pool: false }, snap.modifiers || {});
+  state.steepSite  = snap.steepSite  || "none";
+  state.garageCars = snap.garageCars || 2;
+  state.landscape  = snap.landscape  || "normal";
   state.finishTier = snap.finishTier || "normal";
   state.materials = Object.assign({}, state.materials, snap.materials || {});
+  // Map any legacy material keys to the new normal/elevated/veryHigh set
+  if (state.materials.walls && !MATERIALS.walls.options[state.materials.walls]) state.materials.walls = "normal";
+  if (state.materials.cabinets && !MATERIALS.cabinets.options[state.materials.cabinets]) state.materials.cabinets = "normal";
+  if (state.materials.interior && !MATERIALS.interior.options[state.materials.interior]) state.materials.interior = "normal";
   state.deletedKeys = new Set(snap.deletedKeys || []);
   state.rooms = snap.rooms.map(r => {
     const tpl = TPL[r.tplKey] || {};
