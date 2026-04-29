@@ -96,41 +96,14 @@
   }
 
   /* ----------------- Print stylesheet -----------------
-     Reduces interactive controls to clean text/values for "Print to PDF". */
+     Print the screen as-is. Just hide the action buttons (Reset / Export /
+     Share) since they don't add anything to a printout. */
   @media print {
     @page { size: letter portrait; margin: 0.5in; }
-    body, .page { background: #fff !important; color: #000 !important; padding: 0 !important; max-width: none !important; }
-    /* Hide interactive UI */
-    .stepper button, .segmented button:not(.active),
-    .add-row, .header-actions, input[type=range], .del-btn { display: none !important; }
-    /* Make active segmented button look like text */
-    .segmented {
-      border: none; background: transparent;
+    .header-actions { display: none !important; }
+    .floor-section, .summary-panel, .stat-row, .room-row, .grand-total {
+      break-inside: avoid; page-break-inside: avoid;
     }
-    .segmented button.active {
-      background: transparent !important;
-      color: var(--ink) !important;
-      padding: 0; font-weight: 600;
-      font-family: var(--sans); font-size: 12px;
-      text-transform: none; letter-spacing: 0;
-    }
-    /* Stepper value */
-    .stepper { border: none; background: transparent; }
-    .stepper .value { border: none; padding: 0; font-size: 14px; }
-    /* Chips: only show active ones */
-    .chip { display: none !important; }
-    .chip.active { display: inline !important; background: transparent !important; color: var(--ink) !important; border: none !important; padding: 0; font-size: 12px; font-weight: 600; }
-    .chip.active::before { content: "✓ "; }
-    /* Inputs as text */
-    .dim-input { border: none !important; background: transparent !important; padding: 0 !important; width: auto !important; min-width: 0 !important; }
-    /* Avoid page-break inside cards */
-    .floor-section, .summary-panel, .stat-row, .room-row, .grand-total { break-inside: avoid; page-break-inside: avoid; }
-    /* Slightly tighter spacing */
-    h2.section { margin: 18px 0 8px; }
-    .room-row { padding: 4px 0; }
-    .floors-layout { gap: 18px; }
-    /* Footer wraps, smaller */
-    footer { font-size: 10px; line-height: 1.45; margin-top: 24px; }
   }
 
   /* ---------- Configuration / selection bars ---------- */
@@ -181,16 +154,17 @@
   .segmented button:hover { color: var(--ink); }
   .segmented button.active { background: var(--btn-active); color: var(--ink); }
 
-  /* Vertical text-list for material selections — no boxes, just stacked
-     options. Bold + accent on the selected one. */
+  /* Row text-list for material selections — no boxes, options inline.
+     Walls' active option's description shows in a sibling .opt-desc-display. */
   .segmented.text-list {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
     border: none;
     background: transparent;
     overflow: visible;
-    gap: 6px;
+    gap: 4px 22px;
   }
   .segmented.text-list button {
     border: none;
@@ -211,17 +185,16 @@
     color: var(--accent);
     font-weight: 700;
   }
-  .segmented.text-list .opt-desc {
-    display: block;
+  /* The .opt-desc inside each button is hidden — used as a data carrier only.
+     The active option's description appears in the sibling .opt-desc-display. */
+  .segmented.text-list .opt-desc { display: none; }
+  .opt-desc-display {
     font-family: var(--serif); font-style: italic;
     font-size: 12px; font-weight: 400;
-    color: var(--ink-faint);
-    margin-top: 1px;
-    line-height: 1.35;
-  }
-  .segmented.text-list button.active .opt-desc {
     color: var(--ink-mute);
-    font-weight: 400;
+    margin-top: 4px;
+    min-height: 1.2em;
+    line-height: 1.4;
   }
 
   /* Materials &amp; Finishes section uses an explicit 2-column grid */
@@ -315,12 +288,12 @@
   table.tiers td.tier-name {
     font-style: normal;
     font-weight: 400;
-    font-size: 28px;
-    letter-spacing: 0.04em;
-    line-height: 1.05;
+    font-size: 20px;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
     padding-right: 14px;
     text-align: left;
-    text-transform: uppercase;
+    text-transform: none;
   }
   table.tiers td.range, table.tiers td.psf, table.tiers td.total {
     text-align: right; font-feature-settings: "tnum"; white-space: nowrap;
@@ -345,7 +318,14 @@
   table.tiers td.total { font-size: 21px; color: var(--ink);     font-weight: 500; }
   /* Selected tier row — bold every cell */
   table.tiers tr.selected td { font-weight: 700; }
-  table.tiers tr.selected td.tier-name { font-weight: 600; }  /* condensed already heavy at 600 */
+  table.tiers tr.selected td.tier-name { font-weight: 600; }
+
+  /* Cost Summary section uses title case rather than ALL CAPS */
+  h2.section.cost-h2 { text-transform: none; letter-spacing: 0.02em; font-size: 14px; }
+  .summary-panel table.tiers th { text-transform: none; letter-spacing: 0.04em; }
+  .summary-panel .stat-row .k .sub { text-transform: none; letter-spacing: 0; }
+  .summary-panel .grand-total .k { text-transform: none; letter-spacing: 0.02em; }
+  .summary-panel table.tiers td.psf .label { text-transform: none; letter-spacing: 0.02em; }
   table.tiers tr.selected td {
     background: var(--highlight);
     border-bottom-color: var(--tier-accent-mute);
@@ -623,10 +603,11 @@
     <div class="config-cell">
       <div class="label-line">Exterior walls</div>
       <div class="segmented text-list" id="wallSeg">
-        <button data-mat="normal" class="active">Normal<span class="opt-desc">mix of brick or painted brick and wood siding</span></button>
-        <button data-mat="elevated">Elevated<span class="opt-desc">mix of reclaimed brick, some stone, and wood siding</span></button>
-        <button data-mat="veryHigh">Very High<span class="opt-desc">mostly stone and reclaimed brick, limited wood siding</span></button>
+        <button data-mat="normal" class="active">Normal</button>
+        <button data-mat="elevated">Elevated</button>
+        <button data-mat="veryHigh">Very High</button>
       </div>
+      <div class="opt-desc-display" id="wallDesc"></div>
     </div>
 
     <div class="config-cell">
@@ -668,10 +649,9 @@
   </div>
 
   <!-- ===================== COST SUMMARY ===================== -->
-  <h2 class="section">Cost Summary
+  <h2 class="section cost-h2">Cost Summary
     <span class="header-actions">
       <button id="shareLinkBtn"    type="button" class="export-btn" title="Copy a sharable link with this configuration">Copy share link</button>
-      <button id="printBtn"        type="button" class="export-btn" title="Print / Save as PDF">Print &middot; PDF</button>
       <button id="exportXlsxBtn"   type="button" class="export-btn" title="Export to Excel">Export to Excel</button>
       <button id="resetBtn"        type="button" class="export-btn" title="Reset to defaults">Reset</button>
     </span>
@@ -1160,6 +1140,28 @@ function fixedAdjustments() {
   return sum;
 }
 
+// Dynamic descriptor for the grand total — reflects current material picks.
+function buildSelectedDescriptor() {
+  const w   = MATERIALS.walls.options[state.materials.walls];
+  const rf  = MATERIALS.roof.options[state.materials.roof];
+  const ifn = MATERIALS.interior.options[state.materials.interior];
+  const cb  = MATERIALS.cabinets.options[state.materials.cabinets];
+  const ls  = LANDSCAPE_TIERS[state.landscape || "normal"];
+  const lc  = (s) => (s || "").toLowerCase();
+  const parts = [
+    w.note,                                  // walls description (full sentence-ish)
+    lc(rf.label) + " roof",
+    lc(ifn.label) + " interior finish",
+    lc(cb.label) + " cabinetry",
+    lc(ls.label) + " landscape"
+  ];
+  if (state.modifiers && state.modifiers.pool) parts.push("pool");
+  // Capitalize first letter for sentence feel
+  let s = parts.join(" · ");
+  if (s.length) s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s;
+}
+
 function renderSummary() {
   const t = totals();
 
@@ -1214,7 +1216,7 @@ function renderSummary() {
   const totHiSel = (baseSel.hi + matSum) * (1 + steep) + fixedAdj;
   document.getElementById("selTierName").textContent = TIERS[state.finishTier].label;
   document.getElementById("grandTotal").innerHTML = fmt$M(totLoSel) + "  &ndash;  " + fmt$M(totHiSel);
-  document.getElementById("selTierSub").textContent = TIERS[state.finishTier].sub;
+  document.getElementById("selTierSub").textContent = buildSelectedDescriptor();
 }
 
 function renderRooms() {
@@ -1535,12 +1537,20 @@ function wireControls() {
     });
   });
 
+  function refreshOptDescs() {
+    const wd = document.getElementById("wallDesc");
+    if (wd) {
+      const opt = MATERIALS.walls.options[state.materials.walls];
+      wd.textContent = opt && opt.note ? opt.note : "";
+    }
+  }
   function wireMatSeg(rootSel, cat) {
     document.querySelectorAll(rootSel + " button").forEach(b => {
       b.addEventListener("click", () => {
         document.querySelectorAll(rootSel + " button").forEach(x => x.classList.remove("active"));
         b.classList.add("active");
         state.materials[cat] = b.dataset.mat;
+        refreshOptDescs();
         renderSummary();
         saveState();
       });
@@ -1550,6 +1560,7 @@ function wireControls() {
   wireMatSeg("#roofSeg",     "roof");
   wireMatSeg("#interiorSeg", "interior");
   wireMatSeg("#cabSeg",      "cabinets");
+  refreshOptDescs();
 
   // Print + Excel export + Reset + Share
   const printBtn = document.getElementById("printBtn");
@@ -1734,7 +1745,10 @@ function loadState() {
 }
 
 /* ====================================================================
-   Excel export — uses ExcelJS via CDN; styled with Seaford as the base font.
+   Excel export — single sheet, layout closely mirroring the on-screen UI.
+   Room W and L cells are editable; SF Each / SF Total / floor totals /
+   tier totals all use formulas that recompute when W or L is changed.
+   Styled with Seaford as the base font.
    ==================================================================== */
 async function exportToExcel() {
   const btn = document.getElementById("exportXlsxBtn");
@@ -1751,116 +1765,226 @@ async function exportToExcel() {
     const wb = new ExcelJS.Workbook();
     wb.creator = "Carlisle Moore Architects — Cost Estimator";
     wb.created = new Date();
-    const baseFont = { name: "Seaford", size: 11, color: { argb: "FF1A1A1A" } };
-    const headFont = { name: "Seaford", size: 14, bold: true, color: { argb: "FF1A1A1A" } };
-    const labelFont = { name: "Seaford", size: 10, bold: true, color: { argb: "FF5A7548" } };
-    wb.properties.date1904 = false;
 
-    /* SHEET 1: Project Setup */
-    const setup = wb.addWorksheet("Setup");
-    setup.properties.defaultRowHeight = 18;
-    const setupRows = [
-      ["Construction Cost Estimate"],
-      ["Carlisle Moore Architects"],
-      [""],
-      ["Project Configuration"],
-      ["Bedrooms", state.bedrooms],
-      ["Two-story", state.modifiers.twoStory ? "Yes" : "No"],
-      ["Basement",  state.modifiers.basement ? "Yes" : "No"],
-      ["Steep site", STEEP_TIERS[state.steepSite || "none"].label + " (" + Math.round(STEEP_TIERS[state.steepSite || "none"].pct * 100) + "% surcharge)"],
-      ["Finish tier", TIERS[state.finishTier].label + " — $" + TIERS[state.finishTier].loUR + "-$" + TIERS[state.finishTier].hiUR + " /sf under roof"],
-      [""],
-      ["Material Selections"],
-      ["Exterior walls",      MATERIALS.walls.options[state.materials.walls].label],
-      ["Roof",                MATERIALS.roof.options[state.materials.roof].label],
-      ["Interior finish",     MATERIALS.interior.options[state.materials.interior].label],
-      ["Cabinetry & millwork",MATERIALS.cabinets.options[state.materials.cabinets].label]
-    ];
-    setupRows.forEach((row, i) => {
-      const r = setup.addRow(row);
-      r.eachCell(c => { c.font = baseFont; });
+    const F = {
+      title:    { name: "Seaford", size: 18, bold: true,  color: { argb: "FF1A1A1A" } },
+      sub:      { name: "Seaford", size: 11, italic: true, color: { argb: "FF5A5A5A" } },
+      h2:       { name: "Seaford", size: 12, bold: true,  color: { argb: "FF5A5A5A" } },   /* section header */
+      label:    { name: "Seaford", size: 11, bold: true,  color: { argb: "FF5A5A5A" } },
+      text:     { name: "Seaford", size: 11,               color: { argb: "FF1A1A1A" } },
+      num:      { name: "Seaford", size: 11,               color: { argb: "FF1A1A1A" } },
+      tier:     { name: "Seaford", size: 16, bold: true,  color: { argb: "FF1A1A1A" } },
+      tierSel:  { name: "Seaford", size: 16, bold: true,  color: { argb: "FF5A7548" } },   /* sage green */
+      grand:    { name: "Seaford", size: 18, bold: true,  color: { argb: "FF5A7548" } },
+      floorH:   { name: "Seaford", size: 13, bold: true,  color: { argb: "FF8B2818" } },   /* brick red */
+      tableH:   { name: "Seaford", size:  9, bold: true,  color: { argb: "FF9A9A9A" } }
+    };
+    const ALIGN_R = { horizontal: "right" };
+    const ALIGN_L = { horizontal: "left" };
+
+    const ws = wb.addWorksheet("Estimate", {
+      properties: { defaultRowHeight: 17 },
+      views: [{ showGridLines: false }]
     });
-    setup.getRow(1).font = { name: "Seaford", size: 18, bold: true };
-    setup.getRow(2).font = { name: "Seaford", size: 11, italic: true, color: { argb: "FF5A5A5A" } };
-    setup.getRow(4).font = headFont;
-    setup.getRow(11).font = headFont;
-    setup.getColumn(1).width = 28;
-    setup.getColumn(2).width = 50;
+    // Column widths (A-G):  Name | W | L | Count | SF Each | SF Total | Conditioned
+    ws.getColumn(1).width = 34;
+    ws.getColumn(2).width = 11;
+    ws.getColumn(3).width = 11;
+    ws.getColumn(4).width = 8;
+    ws.getColumn(5).width = 12;
+    ws.getColumn(6).width = 13;
+    ws.getColumn(7).width = 13;
 
-    /* SHEET 2: Rooms — editable W & L; SF formula; conditioned flag drives totals */
-    const rooms = wb.addWorksheet("Rooms");
-    rooms.properties.defaultRowHeight = 18;
-    const headerRow = rooms.addRow(["Floor","Room","Count","W (ft)","L (ft)","SF (each)","SF (total)","Conditioned"]);
-    headerRow.eachCell(c => { c.font = headFont; });
+    // ---- helper to add a labeled row of paired (label, value) cells ----
+    function addRow(values, fontMap) {
+      const r = ws.addRow(values);
+      if (fontMap) Object.keys(fontMap).forEach(c => { r.getCell(+c).font = fontMap[c]; });
+      return r;
+    }
+
+    // ---- 1.  TITLE ----
+    let r = ws.addRow(["Construction Cost Estimator"]);
+    ws.mergeCells(`A${r.number}:G${r.number}`);
+    r.getCell(1).font = F.title;
+    r.height = 28;
+
+    r = ws.addRow(["Carlisle Moore Architects"]);
+    ws.mergeCells(`A${r.number}:G${r.number}`);
+    r.getCell(1).font = F.sub;
+    ws.addRow([]);
+
+    // ---- 2.  HOUSE TYPE ----
+    r = ws.addRow(["House Type"]);
+    r.getCell(1).font = F.h2;
+    ws.addRow(["Bedrooms",          state.bedrooms,
+               "", "Two-story",     state.modifiers.twoStory ? "Yes" : "No"]).eachCell(c => c.font = F.text);
+    ws.addRow(["Basement",          state.modifiers.basement ? "Yes" : "No",
+               "", "Pool",          state.modifiers.pool     ? "Yes" : "No"]).eachCell(c => c.font = F.text);
+    ws.addRow(["Steep site",        STEEP_TIERS[state.steepSite || "none"].label,
+               "", "Finish level",  TIERS[state.finishTier].label]).eachCell(c => c.font = F.text);
+    ws.addRow([]);
+
+    // ---- 3.  MATERIALS & FINISHES ----
+    r = ws.addRow(["Materials & Finishes"]);
+    r.getCell(1).font = F.h2;
+    ws.addRow(["Exterior walls",    MATERIALS.walls.options[state.materials.walls].label,
+               "", "Roof",          MATERIALS.roof.options[state.materials.roof].label]).eachCell(c => c.font = F.text);
+    ws.addRow(["Interior finish",   MATERIALS.interior.options[state.materials.interior].label,
+               "", "Cabinetry",     MATERIALS.cabinets.options[state.materials.cabinets].label]).eachCell(c => c.font = F.text);
+    ws.addRow(["Landscape",         LANDSCAPE_TIERS[state.landscape || "normal"].label]).eachCell(c => c.font = F.text);
+    ws.addRow([]);
+
+    // ---- 4.  ROOMS — editable W / L, formula SF cells ----
+    r = ws.addRow(["Rooms"]); r.getCell(1).font = F.h2;
     const groupName = { floor1:"1st Floor", floor2:"2nd Floor", basement:"Basement", unheated:"Under Roof — Unconditioned" };
-    let firstDataRow = 2, lastDataRow = 1;
+    const dataRowsForFloor = {};   // group -> array of row numbers (data rows only)
+    let firstRoomRow = null, lastRoomRow = null;
     for (const fdef of FLOOR_DEFS) {
       const list = state.rooms.filter(rr => rr.group === fdef.id);
       if (!list.length) continue;
+      // Floor heading
+      r = ws.addRow([groupName[fdef.id] || fdef.id]);
+      r.getCell(1).font = F.floorH;
+      // Column header
+      r = ws.addRow(["Room","W (ft)","L (ft)","Count","SF Each","SF Total","Conditioned"]);
+      r.eachCell(c => { c.font = F.tableH; });
+      [2,3,4,5,6,7].forEach(c => r.getCell(c).alignment = ALIGN_R);
+      // Data rows
+      const floorRows = [];
       for (const rr of list) {
-        const xlRow = rooms.addRow([
-          groupName[fdef.id] || fdef.id,
-          rr.name,
-          rr.count || 1,
-          rr.w,
-          rr.l,
-          { formula: `D${rooms.lastRow.number}*E${rooms.lastRow.number}` },
-          { formula: `C${rooms.lastRow.number}*F${rooms.lastRow.number}` },
-          rr.conditioned ? "Yes" : "No"
-        ]);
-        xlRow.eachCell(c => { c.font = baseFont; });
-        lastDataRow = xlRow.number;
+        const xl = ws.addRow([rr.name, rr.w, rr.l, rr.count || 1, null, null, rr.conditioned ? "Yes" : "No"]);
+        const n = xl.number;
+        xl.getCell(5).value = { formula: `B${n}*C${n}` };
+        xl.getCell(6).value = { formula: `D${n}*E${n}` };
+        xl.eachCell(c => { c.font = F.text; });
+        [2,3,4,5,6,7].forEach(c => xl.getCell(c).alignment = ALIGN_R);
+        floorRows.push(n);
+        if (firstRoomRow === null) firstRoomRow = n;
+        lastRoomRow = n;
       }
+      dataRowsForFloor[fdef.id] = floorRows;
+      // Floor subtotal
+      if (floorRows.length) {
+        const first = floorRows[0], last = floorRows[floorRows.length - 1];
+        const sub = ws.addRow(["Floor total","","","",
+          { formula: `SUMPRODUCT(B${first}:B${last},C${first}:C${last},D${first}:D${last})` },
+          { formula: `F${ws.lastRow.number}` },  // placeholder fixed below
+          ""]);
+        // The SF Total column should also equal the SUMPRODUCT (count is the same), so just sum F:
+        sub.getCell(6).value = { formula: `SUM(F${first}:F${last})` };
+        sub.getCell(5).value = { formula: `SUM(E${first}:E${last})` };
+        sub.getCell(1).font = F.label;
+        [5,6].forEach(c => { sub.getCell(c).font = F.label; sub.getCell(c).alignment = ALIGN_R; });
+      }
+      ws.addRow([]);
     }
-    rooms.getColumn(1).width = 32;
-    rooms.getColumn(2).width = 30;
-    rooms.getColumn(3).width = 8;
-    rooms.getColumn(4).width = 9;
-    rooms.getColumn(5).width = 9;
-    rooms.getColumn(6).width = 12;
-    rooms.getColumn(7).width = 12;
-    rooms.getColumn(8).width = 13;
-    [3,4,5,6,7].forEach(c => rooms.getColumn(c).alignment = { horizontal: "right" });
 
-    /* SHEET 3: Costs — formulas reference Rooms sheet */
-    const costs = wb.addWorksheet("Costs");
-    costs.properties.defaultRowHeight = 18;
-    const condRange = `Rooms!H${firstDataRow}:H${lastDataRow}`;
-    const sfRange   = `Rooms!G${firstDataRow}:G${lastDataRow}`;
-    costs.addRow(["Project Totals"]).getCell(1).font = headFont;
-    costs.addRow(["Conditioned (gross)", { formula: `SUMIF(${condRange},"Yes",${sfRange})` }]);
-    costs.addRow(["+ 15% walls & circulation", { formula: "B2*0.15" }]);
-    costs.addRow(["= Heated & cooled (net)", { formula: "B2+B3" }]);
-    costs.addRow(["Unconditioned under roof", { formula: `SUMIF(${condRange},"No",${sfRange})` }]);
-    costs.addRow(["Total under roof", { formula: "B4+B5" }]);
-    costs.addRow([]);
-    costs.addRow(["Cost Tiers"]).getCell(1).font = headFont;
-    costs.addRow(["Tier","$/sf low","$/sf high","Tier base low","Tier base high","Total low","Total high"]).font = headFont;
-    let tierRow = costs.lastRow.number;
+    // ---- 5.  COST SUMMARY ----
+    r = ws.addRow(["Cost Summary"]); r.getCell(1).font = F.h2;
+    // Build SUMIF over the entire room range using the conditioned column G
+    const condCol = `G${firstRoomRow || 2}:G${lastRoomRow || 2}`;
+    const sfCol   = `F${firstRoomRow || 2}:F${lastRoomRow || 2}`;
+    const condGrossRow = ws.addRow(["Conditioned (gross)",      "",  "",  "",  "", { formula: `SUMIF(${condCol},"Yes",${sfCol})` }, "sf"]);
+    condGrossRow.eachCell(c => c.font = F.text);
+    condGrossRow.getCell(6).alignment = ALIGN_R;
+    const cgN = condGrossRow.number;
+
+    const upliftRow = ws.addRow(["+ 15% walls & circulation", "", "", "", "", { formula: `F${cgN}*0.15` }, "sf"]);
+    upliftRow.eachCell(c => c.font = F.text);
+    upliftRow.getCell(6).alignment = ALIGN_R;
+    const upN = upliftRow.number;
+
+    const hcRow = ws.addRow(["= Heated & cooled (net)",       "", "", "", "", { formula: `F${cgN}+F${upN}` }, "sf"]);
+    hcRow.eachCell(c => c.font = F.label);
+    hcRow.getCell(6).alignment = ALIGN_R;
+    const hcN = hcRow.number;
+
+    const uncRow = ws.addRow(["Unconditioned under roof",     "", "", "", "", { formula: `SUMIF(${condCol},"No",${sfCol})` }, "sf"]);
+    uncRow.eachCell(c => c.font = F.text);
+    uncRow.getCell(6).alignment = ALIGN_R;
+    const uncN = uncRow.number;
+
+    const urRow = ws.addRow(["Total under roof",              "", "", "", "", { formula: `F${hcN}+F${uncN}` }, "sf"]);
+    urRow.eachCell(c => { c.font = F.label; });
+    urRow.getCell(6).alignment = ALIGN_R;
+    urRow.getCell(6).font = { name: "Seaford", size: 13, bold: true, color: { argb: "FF1A1A1A" } };
+    const urN = urRow.number;
+
+    ws.addRow([]);
+
+    // ---- Tier table ----
+    r = ws.addRow(["Tier", "$/sf U-R", "Tier base range", "", "", "Total w/ adjustments"]);
+    r.eachCell(c => { c.font = F.tableH; });
+    [2,3,6].forEach(c => r.getCell(c).alignment = ALIGN_R);
+
     const matPsf = MAT_ORDER.reduce((s, cat) => s + MATERIALS[cat].options[state.materials[cat]].psf, 0);
-    const steep = STEEP_TIERS[state.steepSite || "none"].pct;
+    const steep  = STEEP_TIERS[state.steepSite || "none"].pct;
+    const fixedAdj = (state.modifiers.pool ? POOL_DOLLARS : 0) + LANDSCAPE_TIERS[state.landscape || "normal"].dollars;
+
+    const tierRows = {};
     for (const k of ["normal","high","veryHigh"]) {
       const ti = TIERS[k];
-      const row = costs.addRow([
+      const isSel = (k === state.finishTier);
+      const tr = ws.addRow([
         ti.label,
-        ti.loUR,
-        ti.hiUR,
-        { formula: `B${tierRow + (k==="normal"?1:k==="high"?2:3)}*B6` },
-        { formula: `C${tierRow + (k==="normal"?1:k==="high"?2:3)}*B6` },
-        { formula: `(D${tierRow + (k==="normal"?1:k==="high"?2:3)}+${matPsf}*B6)*${1+steep}` },
-        { formula: `(E${tierRow + (k==="normal"?1:k==="high"?2:3)}+${matPsf}*B6)*${1+steep}` }
+        "$" + ti.loUR + "–$" + ti.hiUR,
+        { formula: `F${urN}*${ti.loUR}` },
+        { formula: `F${urN}*${ti.hiUR}` },
+        "",
+        { formula: `(F${urN}*${ti.loUR}+${matPsf}*F${urN})*${1+steep}+${fixedAdj}` }
       ]);
-      row.eachCell(c => { c.font = baseFont; });
-      [4,5,6,7].forEach(c => row.getCell(c).numFmt = '"$"#,##0');
+      const baseFont = isSel ? F.tierSel : F.tier;
+      tr.getCell(1).font = baseFont;
+      tr.getCell(2).font = isSel ? F.tierSel : F.text;
+      tr.getCell(3).font = isSel ? F.tierSel : F.text;
+      tr.getCell(4).font = isSel ? F.tierSel : F.text;
+      tr.getCell(6).font = baseFont;
+      [3,4,6].forEach(c => { tr.getCell(c).alignment = ALIGN_R; tr.getCell(c).numFmt = '"$"#,##0'; });
+      tr.getCell(2).alignment = ALIGN_R;
+      // Add the upper-bound total in the same cell-formatted row by also writing
+      // a high-bound formula in the same cell: easier to just use 6 and adjust
+      tr.getCell(6).value = { formula: `(F${urN}*${ti.hiUR}+${matPsf}*F${urN})*${1+steep}+${fixedAdj}` };
+      tierRows[k] = tr.number;
     }
-    costs.addRow([]);
-    costs.addRow(["Material adjustment ($/under-roof sf)", matPsf]);
-    costs.addRow(["Steep-site surcharge (%)", steep * 100]);
-    costs.getColumn(1).width = 36;
-    costs.getColumn(2).width = 14;
-    costs.getColumn(3).width = 14;
-    [2,3,4,5,6,7].forEach(c => costs.getColumn(c).alignment = { horizontal: "right" });
-    costs.eachRow(r => r.eachCell(c => { if (!c.font) c.font = baseFont; }));
+    ws.addRow([]);
+
+    // ---- Grand total ----
+    r = ws.addRow(["Selected — " + TIERS[state.finishTier].label]);
+    r.getCell(1).font = F.label;
+    const sel = state.finishTier;
+    const ti = TIERS[sel];
+    const lo = (urN, lo) => `(F${urN}*${ti.loUR}+${matPsf}*F${urN})*${1+steep}+${fixedAdj}`;
+    const hi = (urN)     => `(F${urN}*${ti.hiUR}+${matPsf}*F${urN})*${1+steep}+${fixedAdj}`;
+    const gtLo = ws.addRow(["Total range — low",  "", "", "", "", { formula: lo(urN) }]);
+    const gtHi = ws.addRow(["Total range — high", "", "", "", "", { formula: hi(urN) }]);
+    [gtLo, gtHi].forEach(rr => {
+      rr.getCell(1).font = F.label;
+      rr.getCell(6).font = F.grand;
+      rr.getCell(6).alignment = ALIGN_R;
+      rr.getCell(6).numFmt = '"$"#,##0';
+    });
+
+    r = ws.addRow([buildSelectedDescriptor()]);
+    r.getCell(1).font = F.sub;
+    ws.addRow([]);
+
+    // ---- Notes ----
+    r = ws.addRow(["Material adjustment ($/under-roof sf)", "", "", "", "", matPsf]);
+    r.eachCell(c => c.font = F.text);
+    r.getCell(6).alignment = ALIGN_R; r.getCell(6).numFmt = '"$"#,##0';
+    r = ws.addRow(["Steep-site surcharge (%)",              "", "", "", "", steep * 100]);
+    r.eachCell(c => c.font = F.text);
+    r.getCell(6).alignment = ALIGN_R; r.getCell(6).numFmt = '0.0"%"';
+    r = ws.addRow(["Pool (flat add)",                       "", "", "", "", state.modifiers.pool ? POOL_DOLLARS : 0]);
+    r.eachCell(c => c.font = F.text);
+    r.getCell(6).alignment = ALIGN_R; r.getCell(6).numFmt = '"$"#,##0';
+    r = ws.addRow(["Landscape (flat add)",                  "", "", "", "", LANDSCAPE_TIERS[state.landscape || "normal"].dollars]);
+    r.eachCell(c => c.font = F.text);
+    r.getCell(6).alignment = ALIGN_R; r.getCell(6).numFmt = '"$"#,##0';
+
+    ws.addRow([]);
+    r = ws.addRow(["Edit any room's W or L cell to recompute totals automatically."]);
+    r.getCell(1).font = F.sub;
 
     const buf = await wb.xlsx.writeBuffer();
     const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
