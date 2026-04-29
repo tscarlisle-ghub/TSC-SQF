@@ -3,6 +3,122 @@
 A running log of instructions received from Scott and changes made.
 Most recent at top.
 
+> Going forward this file is `session-notes.md` (non-hidden) so it shows up in
+> Finder. The old hidden copy `.session-notes.md` is left in place per Scott's
+> instruction to never delete files without asking.
+
+---
+
+## 2026-04-29 — Pass 13: hide tier marker, bigger/caps/darker labels, Pool selector under Landscape, House Type spacing
+
+### Instructions received (this batch)
+1. Lose the little bar before the selected tier.
+2. Make the tier, $/sf and other labels ALL CAPS, darker, and 25% larger.
+3. Under landscape, add Pool as a selector and add $120k if selected.
+4. Take Pool out of the Levels chips.
+5. Put the same space between the House Type buttons as on Levels & Site
+   (i.e., consistent spacing across the whole House Type row).
+6. Update the index file.
+7. Think about other things to add (suggestions in chat).
+
+### Changes
+- `.selected-marker` → `display: none`. The cream highlight + bold text
+  carry the selection on their own.
+- Tier table dialed up 25% with darker labels + caps:
+  - Column header (`th`): 13 → 16 px, color `--ink-faint` → `--ink`,
+    text-transform `none` → `uppercase`, weight 500 → 600.
+  - Tier name: 20 → 25 px, weight 400 → 600, ALL CAPS, color `--ink`.
+  - $/sf primary: 18 → 23 px.
+  - "Under roof" label inside the psf cell: 13 → 14 px, ALL CAPS,
+    color `--ink-faint` → `--ink`, weight 500 → 600.
+  - "($X-$X conditioned)" sub-line: 15 → 19 px.
+  - Tier base range: 18 → 23 px, color `--ink-mute` → `--ink`.
+  - Total w/ adjustments: 21 → 26 px, weight 500 → 600.
+- Pool moved out of the Levels chips. The "Levels & site" cell renamed
+  back to just "Levels" with two chips: Two-story / Basement.
+- New **Pool** selector added at the end of Materials & Finishes, right
+  after Landscape. Two options: "No" (default) and "Yes (+$120k)". Wired
+  to the existing `state.modifiers.pool` so all the calc / Excel / share-
+  link / localStorage logic keeps working.
+- House Type bar now uses a chip-style variant of the segmented buttons:
+  no surrounding box, 8 px gap between buttons, individual borders. This
+  gives Steep site and Finish level the same airy spacing as the Levels
+  chips.
+
+### Why I'd recommend a few more additions (chat reply)
+Saved at end of this entry for future reference.
+
+### Instructions received
+1. Tier labels (Normally Nice etc.) **30% smaller**.
+2. Put the selection for the various materials in two columns or a row so they
+   take up less space vertically.
+3. Make the cost summary text **Title Case** (drop the all-caps).
+4. Remove the **Print PDF** button — the screen should print just like it
+   looks (rely on the browser's native Print).
+5. Make the **Excel export** more closely align with the on-screen layout —
+   just room size cells (no sliders), but otherwise a close approximation.
+6. Under the final total price, **change the descriptions based on any changes
+   in the material selections above**.
+7. **Never delete files without asking** (saved as a permanent rule across
+   all projects in memory).
+
+### Changes
+- **Tier label** font-size: 28 → **20 px** (~30% smaller); `text-transform`
+  switched from `uppercase` to `none`; letter-spacing softened.
+- **Material text-list** is now a **row layout** (`flex-direction: row`) with
+  a horizontal gap. The active option's description is rendered in a sibling
+  `.opt-desc-display` element below the row — currently used by Walls, blank
+  for the others. JS keeps it in sync.
+- **Cost summary** uses Title Case throughout: section h2, tier table column
+  headers, tier names, stat-row sub spans, grand-total label, and the
+  "$/sf — Under roof" small label all drop their `text-transform: uppercase`.
+- **Print button** removed from the header. Print stylesheet stripped down to
+  just hiding the action buttons (Reset / Export / Share) so the on-screen
+  layout prints as-is via the browser's native print dialog (Save as PDF
+  still works there).
+- **Excel export** rewritten as a single sheet "Estimate" that closely mirrors
+  the screen:
+  - Title rows: "Construction Cost Estimator" + "Carlisle Moore Architects"
+    (large bold + smaller italic).
+  - **House Type** label/value pairs.
+  - **Materials & Finishes** label/value pairs.
+  - **Rooms** by floor — each floor section has a heading, a column header
+    row, and one data row per room. **W and L are editable cells** (no
+    sliders), `SF Each = W*L` and `SF Total = Count*SF Each` are formulas.
+    Each floor has a subtotal row (also formulas).
+  - **Cost Summary** at the bottom: gross, +15% uplift, H&C, unconditioned,
+    and total under roof — all formulas referencing the rooms range
+    (SUMIF on the Conditioned column).
+  - **Tier table** with formulas multiplying U-R total by the tier's
+    $/sf and adding material adjustments + steep surcharge + pool +
+    landscape.
+  - Selected tier rendered in **sage green bold** (matches the screen).
+  - **Grand total** range, with the **dynamic descriptor** (see below).
+  - Adjustment notes at the bottom (material $/sf, steep %, pool, landscape).
+  - Base font: **Seaford** throughout.
+- **Dynamic descriptor under the grand total**:
+  - New `buildSelectedDescriptor()` function. Generates a phrase from current
+    material selections rather than the tier's static `sub`.
+  - Format: `<walls description> · <roof> roof · <interior> interior finish ·
+    <cabinetry> cabinetry · <landscape> landscape [· pool]`
+  - Example: `Mix of brick or painted brick and wood siding · asphalt roof ·
+    normal interior finish · normal cabinetry · normal landscape`
+  - Updates live whenever a material selector changes.
+  - Same descriptor is used in the Excel export.
+
+### Permanent rule saved to memory
+"Never delete files without asking" — applies to every project, every file
+type (including hidden / leftover / obsolete-looking files). Even if a delete
+seems beneficial (cleanup, replacing with a renamed copy), Claude must explain
+the reason and ask the user before invoking any delete tool. Renames count as
+deletions of the old name. Saved as `feedback_no_delete_without_asking.md`.
+
+### Note on the hidden vs. visible session-notes file
+- Scott rejected the request to delete `.session-notes.md` (the hidden one).
+- Going forward, this file (`session-notes.md`, no leading dot) is the canonical
+  log. The old hidden copy stays in place untouched and is no longer updated.
+- `.gitignore` updated accordingly so neither file gets pushed to a public repo.
+
 ---
 
 ## 2026-04-29 — Pass 11: garage selector, pool, landscape, walls=N/E/VH, big tier-table refresh
