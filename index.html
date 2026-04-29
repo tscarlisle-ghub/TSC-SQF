@@ -58,10 +58,10 @@
     text-transform: none;
   }
 
-  /* Section heading */
+  /* Section heading — 20% larger than before */
   h2.section {
     font-family: var(--sans);
-    font-size: 11px; font-weight: 600;
+    font-size: 13px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.18em;
     color: var(--ink-mute);
     margin: 32px 0 12px;
@@ -115,10 +115,10 @@
   }
   .config-cell .label-line {
     font-family: var(--sans);
-    font-size: 11px; font-weight: 600;
+    font-size: 11px; font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: var(--ink-mute);
+    color: var(--ink);
     margin-bottom: 6px;
   }
 
@@ -288,12 +288,14 @@
     width: 100%; border-collapse: collapse;
     font-family: var(--serif);
   }
-  /* Tier table — condensed throughout; labels in ALL CAPS + darker; 25% larger */
+  /* Tier table — condensed throughout; column headers in Interstate Condensed
+     Medium, ALL CAPS, 20% larger than before. */
   table.tiers th {
     font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
-    font-size: 16px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.16em;
-    color: var(--ink); padding: 4px 6px; text-align: right;
+    font-size: 19px; font-weight: 500;
+    font-style: normal;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--ink); padding: 6px 6px; text-align: right;
     border-bottom: 1px solid var(--rule);
   }
   table.tiers th:first-child { text-align: left; }
@@ -340,8 +342,7 @@
   table.tiers tr.selected td { font-weight: 700; }
   table.tiers tr.selected td.tier-name { font-weight: 600; }
 
-  /* Cost Summary heading stays Title Case; tier-table labels are ALL CAPS */
-  h2.section.cost-h2 { text-transform: none; letter-spacing: 0.02em; font-size: 14px; }
+  /* Sub-spans / grand-total label stay sentence-case; tier table is uppercase */
   .summary-panel .stat-row .k .sub { text-transform: none; letter-spacing: 0; }
   .summary-panel .grand-total .k   { text-transform: none; letter-spacing: 0.02em; }
   table.tiers tr.selected td {
@@ -671,7 +672,7 @@
   </div>
 
   <!-- ===================== COST SUMMARY ===================== -->
-  <h2 class="section cost-h2">Cost Summary
+  <h2 class="section">Cost Summary
     <span class="header-actions">
       <button id="shareLinkBtn"    type="button" class="export-btn" title="Copy a sharable link with this configuration">Copy share link</button>
       <button id="exportXlsxBtn"   type="button" class="export-btn" title="Export to Excel">Export to Excel</button>
@@ -816,6 +817,14 @@ const GARAGE_BY_CAR = {
   1: { w: 12, l: 24, label: "1 car" },
   2: { w: 24, l: 24, label: "2 car" },
   3: { w: 36, l: 24, label: "3 car" }
+};
+
+// Picking a finish level in House Type cascades these defaults into
+// Materials & Finishes (user can still override individual selections after).
+const TIER_PRESETS = {
+  normal:   { walls: "normal",   roof: "asphalt", interior: "normal",   cabinets: "normal",   landscape: "normal"   },
+  high:     { walls: "elevated", roof: "cedar",   interior: "elevated", cabinets: "elevated", landscape: "elevated" },
+  veryHigh: { walls: "veryHigh", roof: "slate",   interior: "veryHigh", cabinets: "veryHigh", landscape: "veryHigh" }
 };
 
 /* ====================================================================
@@ -1162,6 +1171,24 @@ function fixedAdjustments() {
   return sum;
 }
 
+// Cascade: when finish tier changes, push the matching defaults into materials.
+function applyTierPreset(tierKey) {
+  const p = TIER_PRESETS[tierKey];
+  if (!p) return;
+  state.materials.walls    = p.walls;
+  state.materials.roof     = p.roof;
+  state.materials.interior = p.interior;
+  state.materials.cabinets = p.cabinets;
+  state.landscape          = p.landscape;
+  // Update segmented active states + wall description
+  syncUIToState();
+  const wd = document.getElementById("wallDesc");
+  if (wd) {
+    const opt = MATERIALS.walls.options[state.materials.walls];
+    wd.textContent = opt && opt.note ? opt.note : "";
+  }
+}
+
 // Dynamic descriptor for the grand total — reflects current material picks.
 function buildSelectedDescriptor() {
   const w   = MATERIALS.walls.options[state.materials.walls];
@@ -1223,9 +1250,7 @@ function renderSummary() {
       "<td class=\"total\">" + fmt$M(totLo) + " &ndash; " + fmt$M(totHi) + "</td>";
     tr.addEventListener("click", () => {
       state.finishTier = key;
-      document.querySelectorAll("#finishSeg button").forEach(b => {
-        b.classList.toggle("active", b.dataset.tier === key);
-      });
+      applyTierPreset(key);   // cascade matching materials (also re-syncs UI)
       renderSummary();
       saveState();
     });
@@ -1532,6 +1557,7 @@ function wireControls() {
       document.querySelectorAll("#finishSeg button").forEach(x => x.classList.remove("active"));
       b.classList.add("active");
       state.finishTier = b.dataset.tier;
+      applyTierPreset(state.finishTier);   // cascade matching materials
       renderSummary();
       saveState();
     });
