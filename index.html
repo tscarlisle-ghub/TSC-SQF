@@ -13,8 +13,10 @@
     --ink-faint:    #9a9a9a;
     --rule:         #d0cfc4;
     --rule-faint:   #e8e7dd;
-    --accent:       #5a7548;     /* soft sage green */
-    --accent-mute:  #a3b598;
+    --accent:           #8b2818;  /* Tufte's brick red — used everywhere except tier text */
+    --accent-mute:      #c19792;
+    --tier-accent:      #5a7548;  /* soft sage green — tier highlight + final total only */
+    --tier-accent-mute: #a3b598;
     --highlight:    #f6f4e8;
     --btn-active:   #e8e3cc;     /* same family as --highlight, slightly darker */
     --serif:        "Iowan Old Style","Palatino Linotype","Palatino","Book Antiqua",Georgia,serif;
@@ -177,6 +179,37 @@
   .segmented button:hover { color: var(--ink); }
   .segmented button.active { background: var(--btn-active); color: var(--ink); }
 
+  /* Vertical text-list variant for material selections — no boxes, just stacked
+     options. Bold + accent color on the selected one. */
+  .segmented.text-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: none;
+    background: transparent;
+    overflow: visible;
+    gap: 4px;
+  }
+  .segmented.text-list button {
+    border: none;
+    border-right: none;
+    background: transparent;
+    padding: 3px 0;
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-mute);
+    text-align: left;
+  }
+  .segmented.text-list button:hover { color: var(--ink); background: transparent; }
+  .segmented.text-list button.active {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
     display: inline-flex; align-items: center; gap: 6px;
@@ -228,10 +261,13 @@
     letter-spacing: 0.14em; margin-left: 6px;
   }
   .stat-row .v {
-    font-family: var(--mono); font-size: 14px;
+    font-family: var(--mono); font-size: 17px;
     font-feature-settings: "tnum"; color: var(--ink);
     text-align: right; white-space: nowrap;
   }
+  /* Bold the bottom-line "total under roof" number specifically */
+  .stat-row.under-roof-total .v { font-weight: 700; font-size: 19px; }
+  .stat-row.under-roof-total .k { font-weight: 600; }
 
   /* Tier table */
   table.tiers {
@@ -253,12 +289,13 @@
   table.tiers td.tier-name {
     font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
     font-style: normal;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 21px;
-    letter-spacing: 0.005em;
+    letter-spacing: 0.04em;
     line-height: 1.05;
     padding-right: 14px;
     text-align: left;
+    text-transform: uppercase;
   }
   table.tiers td.tier-name .sub {
     display: block;
@@ -294,15 +331,15 @@
   table.tiers td.total { font-size: 14px; color: var(--ink); }
   table.tiers tr.selected td {
     background: var(--highlight);
-    border-bottom-color: var(--accent-mute);
+    border-bottom-color: var(--tier-accent-mute);
   }
-  table.tiers tr.selected td.tier-name { color: var(--accent); font-weight: 500; }
-  table.tiers tr.selected td.total { color: var(--accent); font-weight: 500; }
+  table.tiers tr.selected td.tier-name { color: var(--tier-accent); }
+  table.tiers tr.selected td.total     { color: var(--tier-accent); font-weight: 500; }
   .selected-marker {
     display: inline-block; width: 4px; height: 14px;
     background: transparent; margin-right: 6px; vertical-align: -2px;
   }
-  table.tiers tr.selected .selected-marker { background: var(--accent); }
+  table.tiers tr.selected .selected-marker { background: var(--tier-accent); }
 
   /* Adjustments breakdown */
   .adj-list { margin-top: 8px; }
@@ -339,7 +376,7 @@
   }
   .grand-total .v {
     font-family: var(--mono); font-size: 24px;
-    color: var(--accent); font-feature-settings: "tnum";
+    color: var(--tier-accent); font-feature-settings: "tnum";
     margin-top: 2px;
   }
 
@@ -357,7 +394,8 @@
   .floor-heading .name {
     font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
     font-size: 18px; font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .floor-heading .stats {
     font-family: var(--mono); font-size: 18px;
@@ -370,11 +408,17 @@
     letter-spacing: 0.14em; margin-left: 6px; font-weight: 500;
   }
 
-  /* Rooms — stacked single column inside each floor (the floor itself
-     occupies one column of the .floors-layout grid). */
+  /* Rooms — 2-column grid within each floor; floor sections themselves stack
+     vertically via .floors-layout. */
   .rooms-grid {
-    display: flex; flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 36px;
+    row-gap: 0;
     margin-top: 4px;
+  }
+  @media (max-width: 760px) {
+    .rooms-grid { grid-template-columns: 1fr; column-gap: 0; }
   }
   .room-row {
     padding: 9px 0 9px;
@@ -549,7 +593,7 @@
 
     <div class="config-cell">
       <div class="label-line">Exterior walls</div>
-      <div class="segmented" id="wallSeg">
+      <div class="segmented text-list" id="wallSeg">
         <button data-mat="painted">Painted brick</button>
         <button data-mat="siding">Wood siding</button>
         <button data-mat="brick" class="active">Brick</button>
@@ -560,7 +604,7 @@
 
     <div class="config-cell">
       <div class="label-line">Roof</div>
-      <div class="segmented" id="roofSeg">
+      <div class="segmented text-list" id="roofSeg">
         <button data-mat="asphalt" class="active">Asphalt</button>
         <button data-mat="cedar">Cedar shake</button>
         <button data-mat="slate">Slate</button>
@@ -569,7 +613,7 @@
 
     <div class="config-cell">
       <div class="label-line">Interior finish level</div>
-      <div class="segmented" id="interiorSeg">
+      <div class="segmented text-list" id="interiorSeg">
         <button data-mat="normal" class="active">Normal</button>
         <button data-mat="elevated">Elevated</button>
         <button data-mat="custom">Custom</button>
@@ -578,7 +622,7 @@
 
     <div class="config-cell">
       <div class="label-line">Cabinetry &amp; millwork</div>
-      <div class="segmented" id="cabSeg">
+      <div class="segmented text-list" id="cabSeg">
         <button data-mat="normal" class="active">Normal</button>
         <button data-mat="semi">Semi-custom</button>
         <button data-mat="full">Fully custom</button>
@@ -590,9 +634,10 @@
   <!-- ===================== COST SUMMARY ===================== -->
   <h2 class="section">Cost Summary
     <span class="header-actions">
-      <button id="resetBtn"        type="button" class="export-btn" title="Reset to defaults">Reset</button>
+      <button id="shareLinkBtn"    type="button" class="export-btn" title="Copy a sharable link with this configuration">Copy share link</button>
       <button id="printBtn"        type="button" class="export-btn" title="Print / Save as PDF">Print &middot; PDF</button>
       <button id="exportXlsxBtn"   type="button" class="export-btn" title="Export to Excel">Export to Excel</button>
+      <button id="resetBtn"        type="button" class="export-btn" title="Reset to defaults">Reset</button>
     </span>
   </h2>
   <div class="summary-panel">
@@ -616,7 +661,7 @@
           <span class="k">Unconditioned under-roof</span>
           <span class="v"><span id="unc">0</span> sf</span>
         </div>
-        <div class="stat-row total">
+        <div class="stat-row total under-roof-total">
           <span class="k">Total under roof</span>
           <span class="v"><span id="urTotal">0</span> sf</span>
         </div>
@@ -1051,7 +1096,8 @@ function renderSummary() {
   const matSum = materialAdjustmentSum(t.urTotal);
   const steep  = steepPct();
 
-  // Tier table — under-roof $/sf primary, conditioned $/sf derived in parens
+  // Tier table — under-roof $/sf primary, conditioned $/sf derived in parens.
+  // Clicking a tier row selects that tier (same as clicking the segmented control).
   const tbody = document.getElementById("tiersBody");
   tbody.innerHTML = "";
   for (const key of ["normal","high","veryHigh"]) {
@@ -1062,6 +1108,8 @@ function renderSummary() {
     const psfHCLo = (t.hcNet > 0) ? Math.round(base.lo / t.hcNet) : 0;
     const psfHCHi = (t.hcNet > 0) ? Math.round(base.hi / t.hcNet) : 0;
     const tr = document.createElement("tr");
+    tr.style.cursor = "pointer";
+    tr.dataset.tier = key;
     if (key === state.finishTier) tr.className = "selected";
     tr.innerHTML =
       "<td class=\"tier-name\"><span class=\"selected-marker\"></span>" + ti.label +
@@ -1072,6 +1120,15 @@ function renderSummary() {
       "</td>" +
       "<td class=\"range\">" + fmt$M(base.lo) + " &ndash; " + fmt$M(base.hi) + "</td>" +
       "<td class=\"total\">" + fmt$M(totLo) + " &ndash; " + fmt$M(totHi) + "</td>";
+    tr.addEventListener("click", () => {
+      state.finishTier = key;
+      // Sync the Finish-level segmented buttons too
+      document.querySelectorAll("#finishSeg button").forEach(b => {
+        b.classList.toggle("active", b.dataset.tier === key);
+      });
+      renderSummary();
+      saveState();
+    });
     tbody.appendChild(tr);
   }
 
@@ -1354,7 +1411,7 @@ function wireControls() {
   wireMatSeg("#interiorSeg", "interior");
   wireMatSeg("#cabSeg",      "cabinets");
 
-  // Print + Excel export + Reset
+  // Print + Excel export + Reset + Share
   const printBtn = document.getElementById("printBtn");
   if (printBtn) printBtn.addEventListener("click", () => window.print());
   const xlsxBtn = document.getElementById("exportXlsxBtn");
@@ -1363,7 +1420,31 @@ function wireControls() {
   if (resetBtn) resetBtn.addEventListener("click", () => {
     if (!confirm("Reset to defaults? This will discard the current configuration.")) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    // Also strip ?s= from the URL so reload doesn't re-apply the share link
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
     location.reload();
+  });
+  const shareBtn = document.getElementById("shareLinkBtn");
+  if (shareBtn) shareBtn.addEventListener("click", async () => {
+    syncStateToURL();
+    const url = location.href;
+    const original = shareBtn.textContent;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for older browsers / file:// — use a temp input
+        const tmp = document.createElement("input");
+        tmp.value = url; document.body.appendChild(tmp);
+        tmp.select(); document.execCommand("copy"); tmp.remove();
+      }
+      shareBtn.textContent = "Link copied";
+      shareBtn.disabled = true;
+      setTimeout(() => { shareBtn.textContent = original; shareBtn.disabled = false; }, 1500);
+    } catch (e) {
+      // Show the URL so the user can copy manually
+      prompt("Copy this share link:", url);
+    }
   });
 }
 
@@ -1400,61 +1481,103 @@ function syncUIToState() {
 }
 
 /* ====================================================================
-   localStorage persistence
+   localStorage persistence + share-link URL persistence
    ==================================================================== */
 const STORAGE_KEY = "cma-cost-estimator-v1";
+function buildSnapshot() {
+  return {
+    bedrooms: state.bedrooms,
+    modifiers: state.modifiers,
+    steepSite: state.steepSite,
+    finishTier: state.finishTier,
+    materials: state.materials,
+    rooms: state.rooms.map(r => ({
+      tplKey: r.tplKey, tplIndex: r.tplIndex, name: r.name,
+      w: r.w, l: r.l, count: r.count || 1,
+      group: r.group, conditioned: r.conditioned,
+      removable: r.removable
+    })),
+    deletedKeys: Array.from(state.deletedKeys || [])
+  };
+}
+// Compact base64 (URL-safe) encode for the share link
+function encodeStateForURL(snap) {
+  try {
+    const json = JSON.stringify(snap);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  } catch (e) { return ""; }
+}
+function decodeStateFromURL(s) {
+  try {
+    const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+    const pad = b64.length % 4 ? "=".repeat(4 - (b64.length % 4)) : "";
+    const json = decodeURIComponent(escape(atob(b64 + pad)));
+    return JSON.parse(json);
+  } catch (e) { return null; }
+}
+function syncStateToURL() {
+  try {
+    const snap = buildSnapshot();
+    const enc  = encodeStateForURL(snap);
+    if (!enc) return;
+    const newURL = location.pathname + "?s=" + enc;
+    history.replaceState(null, "", newURL);
+  } catch (e) { /* ignore */ }
+}
 function saveState() {
   try {
-    const snap = {
-      bedrooms: state.bedrooms,
-      modifiers: state.modifiers,
-      steepSite: state.steepSite,
-      finishTier: state.finishTier,
-      materials: state.materials,
-      rooms: state.rooms.map(r => ({
-        tplKey: r.tplKey, tplIndex: r.tplIndex, name: r.name,
-        w: r.w, l: r.l, count: r.count || 1,
-        group: r.group, conditioned: r.conditioned,
-        removable: r.removable
-      })),
-      deletedKeys: Array.from(state.deletedKeys || [])
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(snap));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(buildSnapshot()));
   } catch (e) { /* localStorage unavailable */ }
+  // Keep the URL in sync silently so the address bar IS the share link
+  syncStateToURL();
+}
+function applySnapshot(snap) {
+  if (!snap || !snap.rooms) return false;
+  state.bedrooms = snap.bedrooms ?? 4;
+  state.modifiers = Object.assign({ twoStory: false, basement: false }, snap.modifiers || {});
+  state.steepSite = snap.steepSite || "none";
+  state.finishTier = snap.finishTier || "normal";
+  state.materials = Object.assign({}, state.materials, snap.materials || {});
+  state.deletedKeys = new Set(snap.deletedKeys || []);
+  state.rooms = snap.rooms.map(r => {
+    const tpl = TPL[r.tplKey] || {};
+    return {
+      id: idFor(),
+      tplKey: r.tplKey,
+      tplIndex: r.tplIndex,
+      name: r.name,
+      w: r.w,
+      l: r.l,
+      count: r.count || 1,
+      defaultW: tpl.w || r.w,
+      defaultL: tpl.l || r.l,
+      minW: tpl.minW || 3,
+      minL: tpl.minL || 3,
+      group: r.group,
+      conditioned: r.conditioned,
+      isStair: tpl.isStair === true,
+      removable: r.removable
+    };
+  });
+  return true;
 }
 function loadState() {
+  // Priority 1: URL-encoded share link (?s=...)  takes precedence so a
+  // shared link always wins, even if localStorage has different state.
+  try {
+    const params = new URLSearchParams(location.search);
+    const s = params.get("s");
+    if (s) {
+      const snap = decodeStateFromURL(s);
+      if (snap && applySnapshot(snap)) return true;
+    }
+  } catch (e) { /* ignore */ }
+  // Priority 2: localStorage from this browser
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
-    const snap = JSON.parse(raw);
-    if (!snap || !snap.rooms) return false;
-    state.bedrooms = snap.bedrooms ?? 4;
-    state.modifiers = Object.assign({ twoStory: false, basement: false }, snap.modifiers || {});
-    state.steepSite = snap.steepSite || "none";
-    state.finishTier = snap.finishTier || "normal";
-    state.materials = Object.assign({}, state.materials, snap.materials || {});
-    state.deletedKeys = new Set(snap.deletedKeys || []);
-    state.rooms = snap.rooms.map(r => {
-      const tpl = TPL[r.tplKey] || {};
-      return {
-        id: idFor(),
-        tplKey: r.tplKey,
-        tplIndex: r.tplIndex,
-        name: r.name,
-        w: r.w,
-        l: r.l,
-        count: r.count || 1,
-        defaultW: tpl.w || r.w,
-        defaultL: tpl.l || r.l,
-        minW: tpl.minW || 3,
-        minL: tpl.minL || 3,
-        group: r.group,
-        conditioned: r.conditioned,
-        isStair: tpl.isStair === true,
-        removable: r.removable
-      };
-    });
-    return true;
+    return applySnapshot(JSON.parse(raw));
   } catch (e) { return false; }
 }
 
