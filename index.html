@@ -304,19 +304,19 @@
     width: 100%; border-collapse: collapse;
     font-family: var(--serif);
   }
-  /* Tier table — condensed throughout; column headers in Interstate Condensed
-     Medium, ALL CAPS, 20% larger than before. */
+  /* Tier table — condensed throughout. Column headers and tier text dialed
+     down 25% from the previous pass. */
   table.tiers th {
     font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
-    font-size: 19px; font-weight: 500;
+    font-size: 14px; font-weight: 500;
     font-style: normal;
     text-transform: uppercase; letter-spacing: 0.14em;
-    color: var(--ink); padding: 6px 6px; text-align: right;
+    color: var(--ink); padding: 4px 6px; text-align: right;
     border-bottom: 1px solid var(--rule);
   }
   table.tiers th:first-child { text-align: left; }
   table.tiers td {
-    padding: 12px 6px;
+    padding: 9px 6px;
     border-bottom: 1px solid var(--rule-faint);
     vertical-align: baseline;
     font-family: "interstate-condensed", "Helvetica Neue Condensed", "Arial Narrow", sans-serif;
@@ -325,7 +325,7 @@
   table.tiers td.tier-name {
     font-style: normal;
     font-weight: 600;
-    font-size: 25px;
+    font-size: 19px;
     letter-spacing: 0.04em;
     line-height: 1.05;
     padding-right: 14px;
@@ -338,22 +338,22 @@
   }
   table.tiers td.psf {
     text-align: left;
-    font-size: 23px;
+    font-size: 17px;
     color: var(--ink);
     line-height: 1.25;
     font-weight: 500;
   }
   table.tiers td.psf .label  {
-    font-family: var(--sans); font-size: 14px;
+    font-family: var(--sans); font-size: 10px;
     font-weight: 600;
     color: var(--ink); text-transform: uppercase;
     letter-spacing: 0.16em; margin-left: 6px;
   }
   table.tiers td.psf .cond {
-    display: block; font-size: 19px; color: var(--ink-mute); margin-top: 2px; font-weight: 400;
+    display: block; font-size: 14px; color: var(--ink-mute); margin-top: 2px; font-weight: 400;
   }
-  table.tiers td.range { font-size: 23px; color: var(--ink); font-weight: 500; }
-  table.tiers td.total { font-size: 26px; color: var(--ink); font-weight: 600; }
+  table.tiers td.range { font-size: 17px; color: var(--ink); font-weight: 500; }
+  table.tiers td.total { font-size: 20px; color: var(--ink); font-weight: 600; }
   /* Selected tier row — bold every cell */
   table.tiers tr.selected td { font-weight: 700; }
   table.tiers tr.selected td.tier-name { font-weight: 600; }
@@ -1768,24 +1768,40 @@ function buildSnapshot() {
     landscape: state.landscape,
     finishTier: state.finishTier,
     materials: state.materials,
-    rooms: state.rooms.map(r => ({
-      tplKey: r.tplKey, tplIndex: r.tplIndex, name: r.name,
-      w: r.w, l: r.l, count: r.count || 1,
-      group: r.group, conditioned: r.conditioned,
-      removable: r.removable
-    })),
+    // Rooms are stored compactly:
+    //   k = tplKey, x = tplIndex (only when set), w, l, c = count (only if >1),
+    //   g = group, cond = conditioned (only if it differs from tpl default)
+    // Everything else (name, defaults, mins, isStair, removable) is reconstructed
+    // from the template at load time.
+    rooms: state.rooms.map(r => {
+      const tpl = TPL[r.tplKey] || {};
+      const tplCond = tpl.conditioned !== false;
+      const out = { k: r.tplKey, w: r.w, l: r.l, g: r.group };
+      if (r.tplIndex !== null && r.tplIndex !== undefined) out.x = r.tplIndex;
+      if ((r.count || 1) !== 1)                            out.c = r.count;
+      if (r.conditioned !== tplCond)                       out.cond = r.conditioned;
+      return out;
+    }),
     deletedKeys: Array.from(state.deletedKeys || [])
   };
 }
-// Compact base64 (URL-safe) encode for the share link
+/* ---- LZ-string (1.4.4 by pieroxy, MIT) — embedded for offline compression ---- */
+var LZString=function(){var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-$",t={};function o(r,n){if(!t[r]){t[r]={};for(var e=0;e<r.length;e++)t[r][r.charAt(e)]=e}return t[r][n]}var i={compressToBase64:function(r){if(null==r)return"";var e=i._compress(r,6,function(r){return n.charAt(r)});switch(e.length%4){default:case 0:return e;case 1:return e+"===";case 2:return e+"==";case 3:return e+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(e){return o(n,r.charAt(e))})},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return e.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(n){return o(e,r.charAt(n))}))},compress:function(r){return i._compress(r,16,function(r){return String.fromCharCode(r)})},_compress:function(r,n,e){if(null==r)return"";var t,o,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(t=0;t<h;t++)m<<=1,v==n-1?(v=0,d.push(e(m)),m=0):v++;for(o=c.charCodeAt(0),t=0;t<8;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1}else{for(o=1,t=0;t<h;t++)m=m<<1|o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o=0;for(o=c.charCodeAt(0),t=0;t<16;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(o=s[c],t=0;t<h;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(t=0;t<h;t++)m<<=1,v==n-1?(v=0,d.push(e(m)),m=0):v++;for(o=c.charCodeAt(0),t=0;t<8;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1}else{for(o=1,t=0;t<h;t++)m=m<<1|o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o=0;for(o=c.charCodeAt(0),t=0;t<16;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(o=s[c],t=0;t<h;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(o=2,t=0;t<h;t++)m=m<<1|1&o,v==n-1?(v=0,d.push(e(m)),m=0):v++,o>>=1;for(;;){if(m<<=1,v==n-1){d.push(e(m));break}v++}return d.join("")},_decompress:function(n,e,t){var o,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:t(0),position:e,index:1};for(o=0;o<3;o+=1)l[o]=o;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>n)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=e,g.val=t(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();
+
+// Compact, URL-safe encoding using LZ-string. Falls back to old base64 when
+// decoding so any links already shared with previous versions still work.
 function encodeStateForURL(snap) {
   try {
-    const json = JSON.stringify(snap);
-    const b64 = btoa(unescape(encodeURIComponent(json)));
-    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    return LZString.compressToEncodedURIComponent(JSON.stringify(snap));
   } catch (e) { return ""; }
 }
 function decodeStateFromURL(s) {
+  // Try LZ-string compressed (current format)
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(s);
+    if (json) return JSON.parse(json);
+  } catch (e) {}
+  // Fall back to legacy base64 (for share links saved before compression)
   try {
     const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
     const pad = b64.length % 4 ? "=".repeat(4 - (b64.length % 4)) : "";
@@ -1825,23 +1841,28 @@ function applySnapshot(snap) {
   if (state.materials.interior && !MATERIALS.interior.options[state.materials.interior]) state.materials.interior = "normal";
   state.deletedKeys = new Set(snap.deletedKeys || []);
   state.rooms = snap.rooms.map(r => {
-    const tpl = TPL[r.tplKey] || {};
+    // Accept both the old verbose format ({tplKey, name, conditioned, ...})
+    // and the new compact format ({k, w, l, g, x?, c?, cond?})
+    const tplKey = r.k || r.tplKey;
+    const tpl    = TPL[tplKey] || {};
+    const tplCond = tpl.conditioned !== false;
     return {
       id: idFor(),
-      tplKey: r.tplKey,
-      tplIndex: r.tplIndex,
-      name: r.name,
+      tplKey,
+      tplIndex: (r.x !== undefined) ? r.x : (r.tplIndex !== undefined ? r.tplIndex : null),
+      name: r.name || tpl.name || tplKey,
       w: r.w,
       l: r.l,
-      count: r.count || 1,
+      count: r.c || r.count || 1,
       defaultW: tpl.w || r.w,
       defaultL: tpl.l || r.l,
       minW: tpl.minW || 3,
       minL: tpl.minL || 3,
-      group: r.group,
-      conditioned: r.conditioned,
+      group: r.g || r.group,
+      conditioned: (r.cond !== undefined) ? r.cond
+                : (r.conditioned !== undefined ? r.conditioned : tplCond),
       isStair: tpl.isStair === true,
-      removable: r.removable
+      removable: (r.removable !== undefined) ? r.removable : !(tpl.isStair === true)
     };
   });
   return true;
