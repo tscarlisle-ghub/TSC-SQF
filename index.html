@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Construction Cost Estimator — Carlisle Moore Architects</title>
 <style>
-  /* ----------------------------------------------------------------
-     Tufte-inspired typography & layout
-     ---------------------------------------------------------------- */
   :root {
     --paper:        #fffff8;
     --ink:          #1a1a1a;
@@ -15,9 +12,10 @@
     --ink-faint:    #9a9a9a;
     --rule:         #d0cfc4;
     --rule-faint:   #e8e7dd;
-    --accent:       #8b2818;     /* Tufte's brick red */
+    --accent:       #8b2818;
     --accent-mute:  #c19792;
     --highlight:    #f6f4e8;
+    --btn-active:   #e8e3cc;     /* same family as --highlight, slightly darker */
     --serif:        "Iowan Old Style","Palatino Linotype","Palatino","Book Antiqua",Georgia,serif;
     --sans:         "Helvetica Neue","Helvetica","Arial",sans-serif;
     --mono:         "SF Mono","Menlo","Consolas","Liberation Mono",monospace;
@@ -32,214 +30,300 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  .page {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 40px 48px 80px;
-  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 36px 44px 80px; }
+  @media (max-width: 720px) { .page { padding: 20px 16px 60px; } }
+
+  /* Masthead */
   header.masthead {
     border-bottom: 1px solid var(--ink);
-    padding-bottom: 14px;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
+    padding-bottom: 14px; margin-bottom: 28px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
   }
   header.masthead h1 {
-    font-family: var(--serif);
-    font-weight: normal;
-    font-size: 28px;
-    letter-spacing: -0.01em;
-    margin: 0;
+    font-family: var(--serif); font-weight: normal;
+    font-size: 28px; letter-spacing: -0.01em; margin: 0;
   }
   header.masthead h1 em { font-style: italic; color: var(--ink-mute); }
   header.masthead .firm {
-    font-family: var(--sans);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
+    font-family: var(--sans); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.18em;
     color: var(--ink-mute);
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
-    gap: 56px;
-    align-items: start;
-  }
-  @media (max-width: 960px) {
-    .grid { grid-template-columns: 1fr; gap: 40px; }
-    .summary-col { position: static !important; }
-    .page { padding: 24px 20px 60px; }
-  }
-
+  /* Section heading */
   h2.section {
     font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em;
     color: var(--ink-mute);
-    margin: 36px 0 12px;
+    margin: 32px 0 12px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--rule);
   }
   h2.section:first-child { margin-top: 0; }
 
-  .config-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 8px 0;
-    flex-wrap: wrap;
+  /* ---------- Configuration top bar ---------- */
+  .config-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px 24px;
+    margin-bottom: 8px;
   }
-  .config-row .label {
-    font-family: var(--serif);
-    font-size: 15px;
-    color: var(--ink);
-    min-width: 140px;
-    flex: 0 0 140px;
-  }
-  .config-row .control { flex: 1; min-width: 0; }
-  .config-row .hint {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 12px;
-    color: var(--ink-faint);
+  .config-cell .label-line {
+    font-family: var(--sans);
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.16em; color: var(--ink-faint);
+    margin-bottom: 5px;
   }
 
-  .stepper {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid var(--rule);
-    border-radius: 1px;
+  .stepper, .segmented {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--rule); border-radius: 1px;
     background: #fff;
   }
-  .stepper button {
+  .stepper button, .segmented button {
     background: transparent; border: none;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .stepper button {
     padding: 4px 12px;
-    font-family: var(--mono);
-    font-size: 14px;
-    color: var(--ink-mute);
-    cursor: pointer;
-    transition: color 0.15s;
+    font-family: var(--mono); font-size: 14px; color: var(--ink-mute);
   }
   .stepper button:hover:not(:disabled) { color: var(--ink); }
   .stepper button:disabled { color: var(--ink-faint); cursor: not-allowed; }
   .stepper .value {
-    padding: 4px 14px;
-    font-family: var(--mono);
-    font-size: 14px;
-    border-left: 1px solid var(--rule);
-    border-right: 1px solid var(--rule);
+    padding: 4px 14px; font-family: var(--mono); font-size: 14px;
+    border-left: 1px solid var(--rule); border-right: 1px solid var(--rule);
     min-width: 36px; text-align: center;
   }
-
-  .segmented {
-    display: inline-flex;
-    border: 1px solid var(--rule);
-    border-radius: 1px;
-    background: #fff;
-    overflow: hidden;
-  }
+  .segmented { overflow: hidden; flex-wrap: wrap; }
   .segmented button {
-    background: transparent;
-    border: none;
     border-right: 1px solid var(--rule);
-    padding: 6px 14px;
-    font-family: var(--sans);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
+    padding: 6px 12px;
+    font-family: var(--sans); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.12em;
     color: var(--ink-mute);
-    cursor: pointer;
-    transition: all 0.15s;
   }
   .segmented button:last-child { border-right: none; }
   .segmented button:hover { color: var(--ink); }
-  .segmented button.active {
-    background: var(--ink);
-    color: var(--paper);
-  }
+  .segmented button.active { background: var(--btn-active); color: var(--ink); }
 
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 11px;
-    border: 1px solid var(--rule);
-    border-radius: 1px;
+    border: 1px solid var(--rule); border-radius: 1px;
     background: #fff;
-    font-family: var(--sans);
-    font-size: 12px;
-    color: var(--ink-mute);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
+    font-family: var(--sans); font-size: 12px; color: var(--ink-mute);
+    cursor: pointer; user-select: none; transition: all 0.15s;
   }
   .chip:hover { color: var(--ink); border-color: var(--ink-faint); }
-  .chip.active {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
+  .chip.active { background: var(--btn-active); color: var(--ink); border-color: var(--ink-faint); }
   .chip input { display: none; }
 
-  table.rooms {
-    width: 100%;
-    border-collapse: collapse;
+  /* ---------- Cost summary panel ---------- */
+  .summary-panel {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 18px 0 22px;
+    margin: 12px 0 6px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 36px;
+    align-items: start;
+  }
+  @media (max-width: 800px) {
+    .summary-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 5px 0;
+    align-items: baseline;
+  }
+  .stat-row.indent { padding-left: 16px; color: var(--ink-mute); font-size: 14px; }
+  .stat-row.total {
+    border-top: 1px solid var(--rule);
+    padding-top: 8px; margin-top: 4px; font-weight: 500;
+  }
+  .stat-row .k {
+    font-family: var(--serif); font-size: 14px;
+  }
+  .stat-row .k .sub {
+    font-family: var(--sans); font-size: 10px;
+    color: var(--ink-faint); text-transform: uppercase;
+    letter-spacing: 0.14em; margin-left: 6px;
+  }
+  .stat-row .v {
+    font-family: var(--mono); font-size: 14px;
+    font-feature-settings: "tnum"; color: var(--ink);
+    text-align: right; white-space: nowrap;
+  }
+
+  /* Tier table */
+  table.tiers {
+    width: 100%; border-collapse: collapse;
     font-family: var(--serif);
-    font-size: 14px;
-    margin-top: 4px;
+  }
+  table.tiers th {
+    font-family: var(--sans); font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-faint); padding: 4px 6px; text-align: right;
+    border-bottom: 1px solid var(--rule);
+  }
+  table.tiers th:first-child { text-align: left; }
+  table.tiers td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--rule-faint);
+    vertical-align: baseline;
+  }
+  table.tiers td.tier-name { font-size: 14px; }
+  table.tiers td.tier-name .sub {
+    display: block; font-family: var(--sans); font-size: 9px;
+    color: var(--ink-faint); text-transform: uppercase;
+    letter-spacing: 0.14em; margin-top: 1px;
+  }
+  table.tiers td.range, table.tiers td.psf, table.tiers td.total {
+    text-align: right; font-family: var(--mono);
+    font-feature-settings: "tnum"; white-space: nowrap;
+  }
+  table.tiers td.range { font-size: 13px; color: var(--ink-mute); }
+  table.tiers td.psf   { font-size: 11px; color: var(--ink-faint); }
+  table.tiers td.total { font-size: 14px; color: var(--ink); }
+  table.tiers tr.selected td {
+    background: var(--highlight);
+    border-bottom-color: var(--accent-mute);
+  }
+  table.tiers tr.selected td.tier-name { color: var(--accent); font-weight: 500; }
+  table.tiers tr.selected td.total { color: var(--accent); font-weight: 500; }
+  .selected-marker {
+    display: inline-block; width: 4px; height: 14px;
+    background: transparent; margin-right: 6px; vertical-align: -2px;
+  }
+  table.tiers tr.selected .selected-marker { background: var(--accent); }
+
+  /* Adjustments breakdown */
+  .adj-list { margin-top: 8px; }
+  .adj-row {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 12px; padding: 3px 0; font-size: 13px;
+  }
+  .adj-row .k {
+    font-family: var(--serif); color: var(--ink-mute);
+  }
+  .adj-row .k em {
+    font-style: italic; color: var(--ink-faint);
+    font-family: var(--serif);
+  }
+  .adj-row .v {
+    font-family: var(--mono); font-size: 12px;
+    font-feature-settings: "tnum"; text-align: right; color: var(--ink);
+  }
+  .adj-row .v.zero { color: var(--ink-faint); }
+  .adj-row.sum {
+    border-top: 1px solid var(--rule);
+    margin-top: 4px; padding-top: 6px;
+    font-style: italic; color: var(--ink-mute);
+  }
+
+  .grand-total {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--ink);
+  }
+  .grand-total .k {
+    font-family: var(--sans); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-mute);
+  }
+  .grand-total .v {
+    font-family: var(--mono); font-size: 24px;
+    color: var(--accent); font-feature-settings: "tnum";
+    margin-top: 2px;
+  }
+
+  /* ---------- Rooms ---------- */
+  .floor-section { margin-top: 28px; }
+  .floor-heading {
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 1px solid var(--accent-mute);
+    padding-bottom: 4px; margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .floor-heading .name {
+    font-family: var(--sans); font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em;
+  }
+  .floor-heading .stats {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--ink-mute); font-feature-settings: "tnum";
+  }
+
+  table.rooms {
+    width: 100%; border-collapse: collapse;
+    font-family: var(--serif); font-size: 14px;
   }
   table.rooms th {
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--ink-faint);
-    text-align: left;
-    padding: 6px 8px 6px 0;
+    font-family: var(--sans); font-weight: 500;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.16em; color: var(--ink-faint);
+    text-align: left; padding: 6px 8px 6px 0;
     border-bottom: 1px solid var(--rule);
   }
   table.rooms th.num { text-align: right; }
   table.rooms td {
-    padding: 8px 8px 8px 0;
+    padding: 7px 8px 7px 0;
     border-bottom: 1px solid var(--rule-faint);
     vertical-align: middle;
   }
   table.rooms td.name { width: 200px; color: var(--ink); }
-  table.rooms td.slider { width: auto; }
-  table.rooms td.dim {
-    width: 90px;
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-mute);
+  table.rooms td.slider { width: auto; min-width: 100px; }
+  table.rooms td.dim   {
+    width: 230px; text-align: right; white-space: nowrap;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-mute);
   }
   table.rooms td.sf {
-    width: 70px;
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--ink);
+    width: 60px; text-align: right;
+    font-family: var(--mono); font-size: 13px; color: var(--ink);
     font-feature-settings: "tnum";
   }
   table.rooms td.del { width: 24px; text-align: right; }
-  table.rooms .group-row td {
-    padding: 16px 0 4px;
-    font-family: var(--sans);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--accent);
-    border-bottom: none;
-    font-weight: 500;
+
+  table.rooms input.dim-input {
+    width: 60px; padding: 2px 4px;
+    font-family: var(--mono); font-size: 12px; color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--rule-faint);
+    border-radius: 1px;
+    text-align: right;
+    font-feature-settings: "tnum";
   }
+  table.rooms input.dim-input:focus {
+    outline: none; border-color: var(--accent-mute);
+  }
+  table.rooms .x-sep {
+    display: inline-block; width: 16px; text-align: center;
+    color: var(--ink-faint); font-size: 11px;
+  }
+
+  .add-row {
+    margin-top: 10px; padding: 6px 0;
+    font-family: var(--sans); font-size: 11px;
+    color: var(--ink-mute);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .add-row select, .add-row button {
+    font-family: var(--sans); font-size: 11px;
+    padding: 4px 8px; background: #fff;
+    border: 1px solid var(--rule);
+    color: var(--ink-mute); cursor: pointer;
+  }
+  .add-row button:hover { color: var(--ink); border-color: var(--ink-faint); }
+
   .del-btn {
     background: transparent; border: none;
     color: var(--ink-faint); cursor: pointer;
@@ -249,220 +333,40 @@
   .del-btn:hover { color: var(--accent); }
 
   input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 18px;
-    background: transparent;
-    cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 18px;
+    background: transparent; cursor: pointer;
   }
-  input[type=range]::-webkit-slider-runnable-track {
-    height: 1px; background: var(--rule);
-  }
-  input[type=range]::-moz-range-track {
-    height: 1px; background: var(--rule);
-  }
+  input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--rule); }
+  input[type=range]::-moz-range-track             { height: 1px; background: var(--rule); }
   input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
+    -webkit-appearance: none; appearance: none;
     width: 10px; height: 10px;
-    background: var(--ink);
-    border-radius: 50%;
-    margin-top: -5px;
-    transition: background 0.15s;
+    background: var(--ink); border-radius: 50%;
+    margin-top: -5px; transition: background 0.15s;
   }
   input[type=range]:hover::-webkit-slider-thumb,
   input[type=range]:focus::-webkit-slider-thumb { background: var(--accent); }
   input[type=range]::-moz-range-thumb {
     width: 10px; height: 10px;
-    background: var(--ink);
-    border: none;
-    border-radius: 50%;
+    background: var(--ink); border: none; border-radius: 50%;
   }
 
-  .add-row {
-    margin-top: 12px;
-    font-family: var(--sans);
-    font-size: 12px;
-    color: var(--ink-mute);
+  .fixed-row td.slider, .fixed-row td.dim input {
+    color: var(--ink-faint); font-style: italic;
   }
-  .add-row select, .add-row button {
-    font-family: var(--sans);
-    font-size: 12px;
-    padding: 4px 8px;
-    background: #fff;
-    border: 1px solid var(--rule);
-    color: var(--ink-mute);
-    cursor: pointer;
-  }
-  .add-row button:hover { color: var(--ink); border-color: var(--ink-faint); }
-
-  .summary-col {
-    position: sticky;
-    top: 24px;
-    align-self: start;
-  }
-  .summary-block { font-family: var(--serif); }
-  .summary-block .stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--rule);
-    padding: 10px 0;
-  }
-  .stat .k {
-    font-family: var(--sans);
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--ink-faint);
-    margin-bottom: 2px;
-  }
-  .stat .v {
-    font-family: var(--mono);
-    font-size: 18px;
-    color: var(--ink);
-    font-feature-settings: "tnum";
-  }
-  .stat .v small {
-    font-family: var(--sans);
-    font-size: 10px;
-    color: var(--ink-mute);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    margin-left: 3px;
-  }
-
-  table.tiers {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 8px 0 0;
-    font-family: var(--serif);
-  }
-  table.tiers th {
-    font-family: var(--sans);
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--ink-faint);
-    font-weight: 500;
-    padding: 4px 6px;
-    text-align: right;
-    border-bottom: 1px solid var(--rule);
-  }
-  table.tiers th:first-child { text-align: left; }
-  table.tiers td {
-    padding: 8px 6px;
-    border-bottom: 1px solid var(--rule-faint);
-    vertical-align: baseline;
-  }
-  table.tiers td.tier-name {
-    font-family: var(--serif);
-    font-size: 14px;
-    color: var(--ink);
-  }
-  table.tiers td.tier-name .sub {
-    display: block;
-    font-family: var(--sans);
-    font-size: 9px;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    margin-top: 1px;
-  }
-  table.tiers td.range {
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 14px;
-    color: var(--ink);
-    font-feature-settings: "tnum";
-    white-space: nowrap;
-  }
-  table.tiers td.psf {
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-mute);
-  }
-  table.tiers tr.selected td {
-    background: var(--highlight);
-    border-bottom-color: var(--accent-mute);
-  }
-  table.tiers tr.selected td.tier-name {
-    color: var(--accent);
-    font-weight: 500;
-  }
-  .selected-marker {
-    display: inline-block;
-    width: 4px; height: 14px;
-    background: transparent;
-    margin-right: 6px;
-    vertical-align: -2px;
-  }
-  table.tiers tr.selected .selected-marker { background: var(--accent); }
-
-  table.adj {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 4px;
-    font-family: var(--serif);
-    font-size: 13px;
-  }
-  table.adj td { padding: 4px 0; }
-  table.adj td.adj-label { color: var(--ink-mute); }
-  table.adj td.adj-val {
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-feature-settings: "tnum";
-    color: var(--ink);
-  }
-  table.adj td.adj-val.zero { color: var(--ink-faint); }
-
-  .grand-total {
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid var(--ink);
-  }
-  .grand-total .k {
-    font-family: var(--sans);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--ink-mute);
-  }
-  .grand-total .v {
-    font-family: var(--mono);
-    font-size: 22px;
-    color: var(--accent);
-    font-feature-settings: "tnum";
-    margin-top: 2px;
+  .fixed-tag {
+    font-family: var(--sans); font-size: 9px;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--ink-faint); margin-left: 6px;
   }
 
   footer {
-    margin-top: 60px;
-    padding-top: 16px;
+    margin-top: 60px; padding-top: 16px;
     border-top: 1px solid var(--rule);
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 12px;
-    color: var(--ink-faint);
-    line-height: 1.55;
-    max-width: 70ch;
-  }
-
-  .mat-row { padding: 6px 0; }
-  .mat-row .label-line {
-    display: flex; justify-content: space-between; align-items: baseline;
-    font-family: var(--sans); font-size: 11px;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    color: var(--ink-mute); margin-bottom: 4px;
-  }
-  .mat-row .label-line .delta {
-    font-family: var(--mono); font-size: 11px;
-    color: var(--ink-faint); text-transform: none; letter-spacing: 0;
-    font-feature-settings: "tnum";
+    font-family: var(--serif); font-style: italic;
+    font-size: 12px; color: var(--ink-faint);
+    line-height: 1.55; max-width: 70ch;
   }
 </style>
 </head>
@@ -474,179 +378,131 @@
     <span class="firm">Carlisle Moore Architects</span>
   </header>
 
-  <div class="grid">
-    <!-- ===================== CONFIGURATION COLUMN ===================== -->
-    <div class="config-col">
+  <!-- ===================== CONFIGURATION BAR ===================== -->
+  <h2 class="section">Configuration</h2>
+  <div class="config-bar">
 
-      <h2 class="section">Configuration</h2>
-
-      <div class="config-row">
-        <div class="label">Bedrooms</div>
-        <div class="control">
-          <div class="stepper" id="bedStepper">
-            <button id="bedDown" type="button">&minus;</button>
-            <span class="value" id="bedVal">3</span>
-            <button id="bedUp" type="button">+</button>
-          </div>
-        </div>
-        <div class="hint">Includes the primary suite</div>
+    <div class="config-cell">
+      <div class="label-line">Bedrooms</div>
+      <div class="stepper" id="bedStepper">
+        <button id="bedDown" type="button">&minus;</button>
+        <span class="value" id="bedVal">4</span>
+        <button id="bedUp" type="button">+</button>
       </div>
-
-      <div class="config-row">
-        <div class="label">House type</div>
-        <div class="control">
-          <div class="chips" id="modChips">
-            <label class="chip"><input type="checkbox" data-mod="twoStory"> Two-story</label>
-            <label class="chip"><input type="checkbox" data-mod="basement"> Basement</label>
-            <label class="chip"><input type="checkbox" data-mod="lake">     Lake house</label>
-          </div>
-        </div>
-        <div class="hint">Combine as needed</div>
-      </div>
-
-      <div class="config-row">
-        <div class="label">Finish level</div>
-        <div class="control">
-          <div class="segmented" id="finishSeg">
-            <button data-tier="normal"  class="active">Normal</button>
-            <button data-tier="high">High</button>
-            <button data-tier="veryHigh">Very High</button>
-          </div>
-        </div>
-        <div class="hint">Sets the baseline tier</div>
-      </div>
-
-      <h2 class="section">Material selections</h2>
-
-      <div class="mat-row">
-        <div class="label-line">
-          <span>Exterior walls</span>
-          <span class="delta" id="wallDelta">baseline</span>
-        </div>
-        <div class="segmented" id="wallSeg">
-          <button data-mat="brick" class="active">Brick</button>
-          <button data-mat="siding">Wood siding</button>
-          <button data-mat="stone">Stone</button>
-        </div>
-      </div>
-
-      <div class="mat-row">
-        <div class="label-line">
-          <span>Roof</span>
-          <span class="delta" id="roofDelta">baseline</span>
-        </div>
-        <div class="segmented" id="roofSeg">
-          <button data-mat="asphalt" class="active">Asphalt</button>
-          <button data-mat="cedar">Cedar shake</button>
-          <button data-mat="slate">Slate</button>
-        </div>
-      </div>
-
-      <div class="mat-row">
-        <div class="label-line">
-          <span>Windows</span>
-          <span class="delta" id="winDelta">baseline</span>
-        </div>
-        <div class="segmented" id="winSeg">
-          <button data-mat="standard" class="active">Standard</button>
-          <button data-mat="highend">High-end</button>
-        </div>
-      </div>
-
-      <h2 class="section">Rooms</h2>
-
-      <table class="rooms" id="roomsTable">
-        <thead>
-          <tr>
-            <th>Space</th>
-            <th>Size</th>
-            <th class="num">W &times; L</th>
-            <th class="num">SF</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="roomsBody"></tbody>
-      </table>
-
-      <div class="add-row">
-        <span>Add a room: </span>
-        <select id="addRoomSelect">
-          <option value="study">Study / Office (12 &times; 14)</option>
-          <option value="sittingRoom">Sitting Room (12 &times; 14)</option>
-          <option value="library">Library (14 &times; 16)</option>
-          <option value="hobby">Hobby Room (10 &times; 12)</option>
-          <option value="exercise">Exercise Room (12 &times; 14)</option>
-          <option value="screenedPorch">Screened Porch (14 &times; 18)</option>
-          <option value="extraGarage">Extra Garage Bay (12 &times; 24)</option>
-          <option value="workshop">Workshop (16 &times; 20)</option>
-          <option value="storageRoom">Storage Room (10 &times; 12)</option>
-          <option value="mediaRoom">Media Room (14 &times; 16)</option>
-          <option value="wineRoom">Wine Room (8 &times; 8)</option>
-          <option value="custom">Custom Room (12 &times; 12)</option>
-        </select>
-        <button id="addRoomBtn" type="button">Add</button>
-      </div>
-
     </div>
 
-    <!-- ===================== SUMMARY COLUMN ===================== -->
-    <aside class="summary-col">
-      <div class="summary-block">
+    <div class="config-cell">
+      <div class="label-line">House type</div>
+      <div class="chips" id="modChips">
+        <label class="chip"><input type="checkbox" data-mod="twoStory"> Two-story</label>
+        <label class="chip"><input type="checkbox" data-mod="basement"> Basement</label>
+        <label class="chip"><input type="checkbox" data-mod="steepLot"> Steep lot</label>
+      </div>
+    </div>
 
-        <h2 class="section">Project totals</h2>
+    <div class="config-cell">
+      <div class="label-line">Finish level</div>
+      <div class="segmented" id="finishSeg">
+        <button data-tier="normal"  class="active">Normal</button>
+        <button data-tier="high">High</button>
+        <button data-tier="veryHigh">Very High</button>
+      </div>
+    </div>
 
-        <div class="stats">
-          <div class="stat">
-            <div class="k">Heated &amp; Cooled</div>
-            <div class="v"><span id="hcSF">0</span><small>sf</small></div>
-          </div>
-          <div class="stat" style="text-align:right">
-            <div class="k">Under Roof</div>
-            <div class="v"><span id="frSF">0</span><small>sf</small></div>
-          </div>
+    <div class="config-cell">
+      <div class="label-line">Exterior walls</div>
+      <div class="segmented" id="wallSeg">
+        <button data-mat="painted">Painted brick</button>
+        <button data-mat="siding">Wood siding</button>
+        <button data-mat="brick" class="active">Brick</button>
+        <button data-mat="reclaimed">Reclaimed brick</button>
+        <button data-mat="stone">Stone</button>
+      </div>
+    </div>
+
+    <div class="config-cell">
+      <div class="label-line">Roof</div>
+      <div class="segmented" id="roofSeg">
+        <button data-mat="asphalt" class="active">Asphalt</button>
+        <button data-mat="cedar">Cedar shake</button>
+        <button data-mat="slate">Slate</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== COST SUMMARY ===================== -->
+  <h2 class="section">Cost summary</h2>
+  <div class="summary-panel">
+    <div class="summary-grid">
+
+      <!-- LEFT: SF breakdown -->
+      <div class="sf-block">
+        <div class="stat-row">
+          <span class="k">Conditioned spaces <span class="sub">gross</span></span>
+          <span class="v"><span id="condGross">0</span> sf</span>
         </div>
+        <div class="stat-row indent">
+          <span class="k"><em>+ 15% walls &amp; circulation</em></span>
+          <span class="v">+<span id="uplift">0</span> sf</span>
+        </div>
+        <div class="stat-row total">
+          <span class="k">Heated &amp; cooled <span class="sub">net</span></span>
+          <span class="v"><span id="hcNet">0</span> sf</span>
+        </div>
+        <div class="stat-row">
+          <span class="k">Unconditioned under-roof</span>
+          <span class="v"><span id="unc">0</span> sf</span>
+        </div>
+        <div class="stat-row total">
+          <span class="k">Total under roof</span>
+          <span class="v"><span id="urTotal">0</span> sf</span>
+        </div>
+      </div>
 
-        <h2 class="section">Cost range &mdash; three tiers</h2>
-        <table class="tiers" id="tiersTable">
+      <!-- RIGHT: Tier table + adjustments -->
+      <div class="tier-block">
+        <table class="tiers">
           <thead>
             <tr>
               <th>Tier</th>
-              <th>Range</th>
               <th>$/sf H&amp;C</th>
-              <th>$/sf U-R</th>
+              <th>Tier base range</th>
+              <th>Total w/ adjustments</th>
             </tr>
           </thead>
           <tbody id="tiersBody"></tbody>
         </table>
 
-        <h2 class="section">Material adjustments</h2>
-        <table class="adj" id="adjTable"></table>
+        <div class="adj-list" id="adjList"></div>
 
         <div class="grand-total">
-          <div class="k">Selected &mdash; <span id="selTierName">Normal</span> with materials</div>
+          <div class="k">Selected — <span id="selTierName">Normal</span></div>
           <div class="v" id="grandTotal">$0 &ndash; $0</div>
         </div>
-
       </div>
-    </aside>
+
+    </div>
   </div>
+
+  <!-- ===================== ROOMS ===================== -->
+  <h2 class="section">Rooms</h2>
+  <div id="floorsContainer"></div>
 
   <footer>
     Preliminary cost ranges are derived from recent CMA project bids in the Birmingham, Alabama
-    market. Figures reflect construction cost only &mdash; no land, design fees, site improvements,
-    pools, landscaping, furnishings, or sales tax. Final pricing is determined by the general
-    contractor based on completed construction documents and current market conditions.
-    Carlisle Moore Architects, Inc.
+    market. Tier numbers reflect $/sf of heated &amp; cooled area; the 15% uplift covers wall thicknesses
+    and miscellaneous circulation per CMA's standard area calculations. Material adjustments are computed
+    on under-roof SF. The steep-lot adjustment is a 5% overall surcharge intended to cover deeper
+    foundations, retaining walls, and added site work. Figures are construction cost only — no land,
+    design fees, pools, landscaping, furnishings, or sales tax. Carlisle Moore Architects, Inc.
   </footer>
 </div>
 
 <script>
 /* ====================================================================
-   Data &mdash; derived from /inputs/ estimate set
+   Tier ranges & material adjustments — derived from /inputs/ estimates
    ==================================================================== */
-
-// Tiers expressed as $/sf of HEATED & COOLED area.
-// Derived from same-scope multi-bid spreads on Young, Ray, and Taylor projects.
 const TIERS = {
   normal:   { label: "Normal",     sub: "Asphalt + standard finishes",     lo: 315, hi: 345 },
   high:     { label: "High",       sub: "Cedar shake + nice finishes",     lo: 350, hi: 390 },
@@ -658,9 +514,11 @@ const MATERIALS = {
   walls: {
     label: "Exterior walls",
     options: {
-      brick:   { label: "Brick",       psf:  0,  note: "baseline" },
-      siding:  { label: "Wood siding", psf: -5,  note: "lower coursing labor" },
-      stone:   { label: "Stone",       psf: 14,  note: "full stone veneer" }
+      painted:   { label: "Painted brick",   psf: -3,  note: "utility brick + paint" },
+      siding:    { label: "Wood siding",     psf: -5,  note: "lower coursing labor" },
+      brick:     { label: "Brick",           psf:  0,  note: "baseline face brick" },
+      reclaimed: { label: "Reclaimed brick", psf:  6,  note: "premium reclaimed + slow labor" },
+      stone:     { label: "Stone",           psf: 14,  note: "full stone veneer" }
     }
   },
   roof: {
@@ -670,140 +528,203 @@ const MATERIALS = {
       cedar:   { label: "Cedar shake", psf: 15,  note: "hand-split heavy cedar" },
       slate:   { label: "Slate",       psf: 28,  note: "Vermont slate + copper flashing" }
     }
-  },
-  windows: {
-    label: "Windows",
-    options: {
-      standard: { label: "Standard",   psf:  0, note: "Weathershield clad" },
-      highend:  { label: "High-end",   psf:  3, note: "Marvin / Sierra Pacific" }
-    }
   }
 };
 
-/* Room templates &mdash; defaults follow CMA's SAMPLE SPACE CALCULATIONS sheet */
+const STEEP_LOT_PCT = 0.05;   // 5% surcharge when "Steep lot" is on
+
+/* ====================================================================
+   Stair geometry — fixed
+   11' floor-to-floor, 4'-0" wide flights, switchback w/ 4'-0" landing
+   Plan footprint: 8'-0" wide × 10'-6" long  ≈  84 sf per stair
+   Counted in 1st-floor net (conditioned).
+   Included only when twoStory or basement modifier is on.
+   ==================================================================== */
+const STAIR = { w: 8.0, l: 10.5, sf: 84 };
+
+/* ====================================================================
+   Room templates — defaults
+   All defaults in 6-inch increments (decimal feet, multiples of 0.5).
+   ==================================================================== */
 const TPL = {
-  // Common (1st floor)
-  entry:        { name: "Entry / Foyer",         w: 8,  l: 10, min: 48,  group: "common" },
-  kitchen:      { name: "Kitchen",               w: 16, l: 20, min: 180, group: "common" },
-  pantry:       { name: "Pantry",                w: 6,  l: 8,  min: 24,  group: "common" },
-  dining:       { name: "Dining Room",           w: 14, l: 16, min: 120, group: "common" },
-  living:       { name: "Living Room",           w: 20, l: 24, min: 320, group: "common" },
-  mudroom:      { name: "Mudroom",               w: 8,  l: 10, min: 48,  group: "common" },
-  powder:       { name: "Powder Room",           w: 5,  l: 7,  min: 24,  group: "common" },
-  laundry:      { name: "Laundry",               w: 10, l: 12, min: 80,  group: "common" },
-  // Primary suite
-  primaryBed:   { name: "Primary Bedroom",       w: 16, l: 18, min: 224, group: "primary" },
-  primaryBath:  { name: "Primary Bath / Closet", w: 16, l: 18, min: 196, group: "primary" },
-  // Per-bedroom triplet
-  bedroom:      { name: "Bedroom",               w: 14, l: 14, min: 144, group: "bedrooms" },
-  bath:         { name: "Bath",                  w: 7,  l: 10, min: 50,  group: "bedrooms" },
-  closet:       { name: "Closet",                w: 7,  l: 8,  min: 36,  group: "bedrooms" },
-  // 2nd floor only
-  stairs:       { name: "Stairs",                w: 5,  l: 16, min: 60,  group: "stairs" },
+  // 1st floor common (defaults reflect averages observed across Young, Davis,
+  // Stratas, Ray plan sets — see .session-notes.md)
+  entry:        { name: "Entry / Foyer",         w: 8,    l: 10,   minW: 5,   minL: 6,   group: "floor1" },
+  kitchen:      { name: "Kitchen",               w: 16,   l: 22,   minW: 10,  minL: 12,  group: "floor1" },
+  pantry:       { name: "Pantry",                w: 5,    l: 9,    minW: 3,   minL: 4,   group: "floor1" },
+  dining:       { name: "Dining Room",           w: 12,   l: 18,   minW: 10,  minL: 10,  group: "floor1" },
+  living:       { name: "Great Room",            w: 20,   l: 22,   minW: 14,  minL: 16,  group: "floor1" },
+  hearthRoom:   { name: "Hearth Room",           w: 14,   l: 16,   minW: 10,  minL: 12,  group: "floor1" },
+  study:        { name: "Study / Office",        w: 12,   l: 14,   minW: 8,   minL: 10,  group: "floor1" },
+  mudroom:      { name: "Mudroom",               w: 6,    l: 12,   minW: 5,   minL: 6,   group: "floor1" },
+  powder:       { name: "Powder Room",           w: 5,    l: 6,    minW: 3,   minL: 5,   group: "floor1" },
+  laundry:      { name: "Laundry",               w: 8,    l: 12,   minW: 6,   minL: 8,   group: "floor1" },
+
+  // Primary suite (separate bath & closet, matching CMA plan-set patterns)
+  primaryBed:    { name: "Primary Bedroom",      w: 16,   l: 18,   minW: 12,  minL: 14,  group: "floor1" },
+  primaryBath:   { name: "Primary Bath",         w: 10,   l: 16,   minW: 8,   minL: 10,  group: "floor1" },
+  primaryCloset: { name: "Primary Closet",       w: 8,    l: 12,   minW: 6,   minL: 8,   group: "floor1" },
+
+  // Per-bedroom triplet (sized to typical CMA secondary suite)
+  bedroom:      { name: "Bedroom",               w: 12,   l: 14,   minW: 10,  minL: 11,  group: "floor1" },
+  bath:         { name: "Bath",                  w: 6,    l: 10,   minW: 5,   minL: 7,   group: "floor1" },
+  closet:       { name: "Closet",                w: 6,    l: 8,    minW: 4,   minL: 5,   group: "floor1" },
+
+  // Stairs (fixed)
+  stairUp:      { name: "Stair to 2nd Floor",    w: STAIR.w, l: STAIR.l, fixed: true, group: "floor1" },
+  stairDown:    { name: "Stair to Basement",     w: STAIR.w, l: STAIR.l, fixed: true, group: "floor1" },
+
   // Basement
-  bsmtStorage:  { name: "Basement Storage",      w: 16, l: 20, min: 200, group: "basement", conditioned: false },
-  bsmtMedia:    { name: "Media Room",            w: 14, l: 16, min: 144, group: "basement" },
-  bsmtMech:     { name: "Mechanical",            w: 8,  l: 10, min: 60,  group: "basement", conditioned: false },
-  // Lake house extra
-  screenedPorchLake: { name: "Screened Porch",   w: 14, l: 22, min: 200, group: "unheated", conditioned: false },
-  // Unheated (always)
-  garage:       { name: "Garage",                w: 24, l: 24, min: 360, group: "unheated", conditioned: false },
-  frontPorch:   { name: "Front Porch",           w: 8,  l: 20, min: 60,  group: "unheated", conditioned: false },
-  rearPorch:    { name: "Rear Porch",            w: 12, l: 16, min: 80,  group: "unheated", conditioned: false },
-  // Add-room palette
-  study:        { name: "Study / Office",        w: 12, l: 14, min: 120, group: "addons" },
-  sittingRoom:  { name: "Sitting Room",          w: 12, l: 14, min: 120, group: "addons" },
-  library:      { name: "Library",               w: 14, l: 16, min: 144, group: "addons" },
-  hobby:        { name: "Hobby Room",            w: 10, l: 12, min: 80,  group: "addons" },
-  exercise:     { name: "Exercise Room",         w: 12, l: 14, min: 100, group: "addons" },
-  screenedPorch:{ name: "Screened Porch",        w: 14, l: 18, min: 144, group: "unheated", conditioned: false },
-  extraGarage:  { name: "Extra Garage Bay",      w: 12, l: 24, min: 200, group: "unheated", conditioned: false },
-  workshop:     { name: "Workshop",              w: 16, l: 20, min: 200, group: "unheated", conditioned: false },
-  storageRoom:  { name: "Storage Room",          w: 10, l: 12, min: 80,  group: "addons" },
-  mediaRoom:    { name: "Media Room",            w: 14, l: 16, min: 144, group: "addons" },
-  wineRoom:     { name: "Wine Room",             w: 8,  l: 8,  min: 40,  group: "addons" },
-  custom:       { name: "Custom Room",           w: 12, l: 12, min: 80,  group: "addons" }
+  bsmtMedia:    { name: "Media Room",            w: 14,   l: 18,   minW: 10,  minL: 12,  group: "basement" },
+  bsmtStorage:  { name: "Storage",               w: 16,   l: 20,   minW: 8,   minL: 10,  group: "basement", conditioned: false },
+  bsmtMech:     { name: "Mechanical",            w: 8,    l: 10,   minW: 6,   minL: 8,   group: "basement", conditioned: false },
+
+  // Unheated under-roof
+  garage:       { name: "Garage",                w: 24,   l: 24,   minW: 18,  minL: 20,  group: "unheated", conditioned: false },
+  frontPorch:   { name: "Front Porch",           w: 8,    l: 20,   minW: 5,   minL: 8,   group: "unheated", conditioned: false },
+  rearPorch:    { name: "Rear Porch",            w: 12,   l: 16,   minW: 6,   minL: 8,   group: "unheated", conditioned: false },
+
+  // Add-room palette (assigned to a floor on add)
+  study:        { name: "Study / Office",        w: 12,   l: 14,   minW: 8,   minL: 10  },
+  sittingRoom:  { name: "Sitting Room",          w: 12,   l: 14,   minW: 8,   minL: 10  },
+  library:      { name: "Library",               w: 14,   l: 16,   minW: 10,  minL: 12  },
+  hobby:        { name: "Hobby Room",            w: 10,   l: 12,   minW: 8,   minL: 10  },
+  exercise:     { name: "Exercise Room",         w: 12,   l: 14,   minW: 10,  minL: 10  },
+  playroom:     { name: "Playroom",              w: 14,   l: 16,   minW: 10,  minL: 12  },
+  bonusRoom:    { name: "Bonus Room",            w: 16,   l: 20,   minW: 12,  minL: 14  },
+  upstairsLaundry: { name: "Upstairs Laundry",   w: 8,    l: 10,   minW: 6,   minL: 6   },
+  storageRoom:  { name: "Storage Room",          w: 10,   l: 12,   minW: 6,   minL: 8   },
+  mediaRoom:    { name: "Media Room",            w: 14,   l: 16,   minW: 10,  minL: 12  },
+  wineRoom:     { name: "Wine Room",             w: 8,    l: 8,    minW: 5,   minL: 6   },
+  guestSuite:   { name: "Guest Bedroom + Bath",  w: 14,   l: 18,   minW: 10,  minL: 12  },
+  screenedPorch:{ name: "Screened Porch",        w: 14,   l: 18,   minW: 10,  minL: 12,  conditioned: false },
+  workshop:     { name: "Workshop",              w: 16,   l: 20,   minW: 10,  minL: 12,  conditioned: false },
+  extraGarage:  { name: "Extra Garage Bay",      w: 12,   l: 24,   minW: 10,  minL: 20,  conditioned: false },
+  custom:       { name: "Custom Room",           w: 12,   l: 12,   minW: 6,   minL: 6   }
 };
 
-const GROUP_LABELS = {
-  common:    "First Floor — Common Areas",
-  primary:   "Primary Suite",
-  bedrooms:  "Additional Bedrooms",
-  bedroomsUp:"Second Floor — Bedrooms",
-  stairs:    "Circulation",
-  basement:  "Basement",
-  addons:    "Additional Spaces",
-  unheated:  "Under Roof — Unconditioned"
+const FLOOR_DEFS = [
+  { id: "floor1",   name: "1st Floor",                       conditioned: true  },
+  { id: "floor2",   name: "2nd Floor",                       conditioned: true  },
+  { id: "basement", name: "Basement",                        conditioned: true  },
+  { id: "unheated", name: "Under Roof — Unconditioned",     conditioned: false }
+];
+
+// Add-palette by floor (which room types appear in each floor's add menu)
+const ADD_PALETTE = {
+  floor1:   ["hearthRoom","study","sittingRoom","library","guestSuite","mediaRoom","hobby","custom"],
+  floor2:   ["sittingRoom","upstairsLaundry","playroom","bonusRoom","exercise","study","custom"],
+  basement: ["bonusRoom","exercise","mediaRoom","wineRoom","hobby","playroom","storageRoom","guestSuite","custom"],
+  unheated: ["screenedPorch","workshop","extraGarage","frontPorch","rearPorch"]
 };
 
-/* State */
+/* ====================================================================
+   State
+   ==================================================================== */
 const state = {
   bedrooms: 4,
-  modifiers: { twoStory: false, basement: false, lake: false },
+  modifiers: { twoStory: false, basement: false, steepLot: false },
   finishTier: "normal",
-  materials:  { walls: "brick", roof: "asphalt", windows: "standard" },
-  rooms: []
+  materials:  { walls: "brick", roof: "asphalt" },
+  rooms: [],   // { id, tplKey, tplIndex?, name, w, l, group, conditioned, fixed, minW, minL, removable }
+  deletedKeys: new Set()   // keys (tplKey:tplIndex:group) the user has explicitly removed
 };
-
 let nextRoomId = 1;
 const idFor = () => "r" + (nextRoomId++);
 
-/* Build / rebuild rooms based on bedrooms + modifiers; preserve user SF customizations. */
+/* ====================================================================
+   Foot-inch helpers (6" snap)
+   ==================================================================== */
+function snap6(ft) {
+  // Snap to nearest 0.5 ft (= 6")
+  return Math.max(0.5, Math.round(ft * 2) / 2);
+}
+function fmtFI(ft) {
+  ft = snap6(ft);
+  let f = Math.floor(ft);
+  let i = Math.round((ft - f) * 12);
+  if (i === 12) { f += 1; i = 0; }
+  return f + "'-" + i + "\"";
+}
+// Parse "14'-6\"", "14-6", "14.5", "14 6", "14"
+function parseFI(s) {
+  if (s == null) return null;
+  s = String(s).trim().replace(/[“”"]/g, "");
+  if (!s) return null;
+  let m = s.match(/^(\d+(?:\.\d+)?)\s*[-'\s]?\s*(\d+(?:\.\d+)?)?\s*$/);
+  if (!m) return null;
+  let ft = parseFloat(m[1]);
+  let inches = m[2] ? parseFloat(m[2]) : 0;
+  // If user typed "14.5", treat as decimal feet; if "14-6", treat as ft-in
+  if (m[2]) ft += inches / 12;
+  return ft;
+}
+
+/* ====================================================================
+   Build / rebuild rooms based on bedrooms + modifiers
+   ==================================================================== */
 function buildRoomList() {
+  // Capture user customizations keyed by stable identity (tplKey + index + group)
   const prev = {};
   state.rooms.forEach(r => {
-    const key = r.tplKey + ":" + (r.tplIndex == null ? "x" : r.tplIndex);
-    prev[key] = { sf: r.sf };
+    const key = r.tplKey + ":" + (r.tplIndex == null ? "x" : r.tplIndex) + ":" + r.group;
+    prev[key] = { w: r.w, l: r.l };
   });
 
   state.rooms = [];
 
-  ["entry","kitchen","pantry","dining","living","mudroom","powder","laundry"]
+  // 1st floor base (always)
+  ["entry","kitchen","pantry","dining","living","hearthRoom","study","mudroom","powder","laundry"]
     .forEach(k => addRoom(k));
 
-  addRoom("primaryBed",  "primary");
-  addRoom("primaryBath", "primary");
+  // Primary suite — 1st floor (separate bath + closet, per CMA plan convention)
+  addRoom("primaryBed");
+  addRoom("primaryBath");
+  addRoom("primaryCloset");
 
+  // Extra bedrooms
   const extra = Math.max(0, state.bedrooms - 1);
-  const upstairsExtras   = state.modifiers.twoStory ? extra : 0;
-  const downstairsExtras = extra - upstairsExtras;
+  const upstairs   = state.modifiers.twoStory ? extra : 0;
+  const downstairs = extra - upstairs;
 
-  for (let i = 0; i < downstairsExtras; i++) {
-    addRoom("bedroom", "bedrooms", null, i, " " + (i + 2));
-    addRoom("bath",    "bedrooms", null, i);
-    addRoom("closet",  "bedrooms", null, i);
+  for (let i = 0; i < downstairs; i++) {
+    addRoom("bedroom", "floor1", null, i, " " + (i + 2));
+    addRoom("bath",    "floor1", null, i);
+    addRoom("closet",  "floor1", null, i);
   }
 
+  // Stairs — only if twoStory or basement
+  if (state.modifiers.twoStory) addRoom("stairUp", "floor1");
+  if (state.modifiers.basement) addRoom("stairDown", "floor1");
+
+  // Upstairs bedrooms
   if (state.modifiers.twoStory) {
-    addRoom("stairs", "stairs");
-    for (let i = 0; i < upstairsExtras; i++) {
-      const idx = i + downstairsExtras;
-      addRoom("bedroom", "bedroomsUp", null, idx, " " + (idx + 2));
-      addRoom("bath",    "bedroomsUp", null, idx);
-      addRoom("closet",  "bedroomsUp", null, idx);
+    for (let i = 0; i < upstairs; i++) {
+      const idx = i + downstairs;
+      addRoom("bedroom", "floor2", null, idx, " " + (idx + 2));
+      addRoom("bath",    "floor2", null, idx);
+      addRoom("closet",  "floor2", null, idx);
     }
   }
 
+  // Basement
   if (state.modifiers.basement) {
     addRoom("bsmtMedia",   "basement");
     addRoom("bsmtStorage", "basement");
     addRoom("bsmtMech",    "basement");
   }
 
+  // Unheated under-roof
   addRoom("garage",     "unheated");
   addRoom("frontPorch", "unheated");
   addRoom("rearPorch",  "unheated");
 
-  if (state.modifiers.lake) {
-    addRoom("screenedPorchLake", "unheated");
-  }
-
   // Restore prior customizations
   state.rooms.forEach(r => {
-    const key = r.tplKey + ":" + (r.tplIndex == null ? "x" : r.tplIndex);
-    if (prev[key]) {
-      r.sf = prev[key].sf;
-      computeDimensions(r);
+    const key = r.tplKey + ":" + (r.tplIndex == null ? "x" : r.tplIndex) + ":" + r.group;
+    if (prev[key] && !r.fixed) {
+      r.w = prev[key].w;
+      r.l = prev[key].l;
     }
   });
 }
@@ -811,83 +732,99 @@ function buildRoomList() {
 function addRoom(tplKey, groupOverride, idOverride, tplIndex, nameSuffix) {
   const tpl = TPL[tplKey];
   if (!tpl) return null;
-  const sf = tpl.w * tpl.l;
+  const group = groupOverride || tpl.group || "floor1";
+  const idx   = (tplIndex == null) ? null : tplIndex;
+  const dKey  = tplKey + ":" + (idx == null ? "x" : idx) + ":" + group;
+  // Honor prior deletions across rebuilds
+  if (state.deletedKeys.has(dKey)) return null;
   const r = {
     id: idOverride || idFor(),
     tplKey,
-    tplIndex: (tplIndex == null) ? null : tplIndex,
+    tplIndex: idx,
     name: tpl.name + (nameSuffix || ""),
-    w: tpl.w, l: tpl.l,
-    defaultSF: sf,
-    minSF: tpl.min,
-    sf: sf,
-    group: groupOverride || tpl.group,
+    w: tpl.w,
+    l: tpl.l,
+    defaultW: tpl.w,
+    defaultL: tpl.l,
+    minW: tpl.minW || 3,
+    minL: tpl.minL || 3,
+    group: group,
     conditioned: tpl.conditioned !== false,
-    removable: false
+    fixed: tpl.fixed === true,
+    // Stairs are not removable; everything else can be deleted by the user
+    removable: !(tpl.fixed === true)
   };
   state.rooms.push(r);
   return r;
 }
 
-function addUserRoom(tplKey) {
+function addUserRoom(tplKey, group) {
   const tpl = TPL[tplKey];
   if (!tpl) return;
-  const r = addRoom(tplKey, tpl.group);
+  // Give a unique tplIndex so it never collides with the default-room dedup key
+  const uniqueIdx = "u" + Date.now() + "-" + Math.floor(Math.random() * 999);
+  const r = addRoom(tplKey, group, null, uniqueIdx);
+  if (!r) return;
+  if (group === "unheated") r.conditioned = false;
   r.removable = true;
   render();
 }
 
 function removeRoom(id) {
-  state.rooms = state.rooms.filter(r => r.id !== id);
-  renderRooms();
-  renderSummary();
-}
-
-function computeDimensions(r) {
-  const ratio = Math.sqrt(r.sf / r.defaultSF);
-  const tpl = TPL[r.tplKey];
-  r.w = tpl.w * ratio;
-  r.l = tpl.l * ratio;
-}
-
-/* Calculations */
-function totals() {
-  let hcSF = 0, frSF = 0, secondFloorNetSF = 0;
-  for (const r of state.rooms) {
-    if (r.conditioned) {
-      hcSF += r.sf;
-      if (r.group === "bedroomsUp") secondFloorNetSF += r.sf;
-    }
-    frSF += r.sf;
+  const r = state.rooms.find(x => x.id === id);
+  if (r) {
+    const dKey = r.tplKey + ":" + (r.tplIndex == null ? "x" : r.tplIndex) + ":" + r.group;
+    state.deletedKeys.add(dKey);
   }
-  // 15% second-floor circulation/walls uplift (mirrors SAMPLE sheet logic)
-  const upliftHC = secondFloorNetSF * 0.15;
-  hcSF += upliftHC;
-  frSF += upliftHC;
-  return { hcSF: Math.round(hcSF), frSF: Math.round(frSF) };
+  state.rooms = state.rooms.filter(r => r.id !== id);
+  render();
 }
 
-function tierCost(tierKey, hcSF) {
+/* ====================================================================
+   Calculations
+   ==================================================================== */
+function totals() {
+  let condGross = 0, unc = 0;
+  for (const r of state.rooms) {
+    const sf = r.w * r.l;
+    if (r.conditioned) condGross += sf;
+    else                unc      += sf;
+  }
+  const uplift = condGross * 0.15;
+  const hcNet  = condGross + uplift;
+  const urTotal = hcNet + unc;
+  return {
+    condGross: Math.round(condGross),
+    uplift:    Math.round(uplift),
+    hcNet:     Math.round(hcNet),
+    unc:       Math.round(unc),
+    urTotal:   Math.round(urTotal)
+  };
+}
+
+function tierBaseRange(tierKey, hcNet) {
   const t = TIERS[tierKey];
-  return { lo: t.lo * hcSF, hi: t.hi * hcSF };
+  return { lo: t.lo * hcNet, hi: t.hi * hcNet };
 }
 
-function materialAdjustments(frSF) {
+function materialAdjustments(urTotal) {
   const out = [];
-  for (const cat of ["walls","roof","windows"]) {
+  for (const cat of ["walls","roof"]) {
     const sel = state.materials[cat];
     const opt = MATERIALS[cat].options[sel];
     out.push({
       category: MATERIALS[cat].label,
       option: opt.label,
       psf: opt.psf,
-      dollars: opt.psf * frSF
+      dollars: opt.psf * urTotal
     });
   }
   return out;
 }
 
-/* Formatting */
+/* ====================================================================
+   Formatting
+   ==================================================================== */
 function fmt$M(n) {
   const sign = n < 0 ? "−" : "";
   const abs = Math.abs(Math.round(n));
@@ -895,142 +832,289 @@ function fmt$M(n) {
   if (abs >= 10_000)    return sign + "$" + Math.round(abs / 1000) + "k";
   return sign + "$" + abs.toLocaleString();
 }
-function fmtSF(n) { return Math.round(n).toLocaleString(); }
+function fmt$signed(n) {
+  if (Math.round(n) === 0) return "—";
+  return (n > 0 ? "+" : "−") + "$" + Math.abs(Math.round(n)).toLocaleString();
+}
+const fmtSF = n => Math.round(n).toLocaleString();
 
-/* Rendering */
+/* ====================================================================
+   Rendering
+   ==================================================================== */
 function render() {
   document.getElementById("bedVal").textContent = state.bedrooms;
   document.getElementById("bedDown").disabled = state.bedrooms <= 1;
   document.getElementById("bedUp").disabled   = state.bedrooms >= 8;
-  renderRooms();
   renderSummary();
-}
-
-function renderRooms() {
-  const tbody = document.getElementById("roomsBody");
-  tbody.innerHTML = "";
-
-  const order = ["common","primary","bedrooms","stairs","bedroomsUp","basement","addons","unheated"];
-  const grouped = {};
-  for (const r of state.rooms) (grouped[r.group] = grouped[r.group] || []).push(r);
-
-  for (const g of order) {
-    if (!grouped[g] || !grouped[g].length) continue;
-
-    const trH = document.createElement("tr");
-    trH.className = "group-row";
-    trH.innerHTML = "<td colspan=\"5\">" + (GROUP_LABELS[g] || g) + "</td>";
-    tbody.appendChild(trH);
-
-    for (const r of grouped[g]) {
-      const tr = document.createElement("tr");
-      tr.dataset.id = r.id;
-
-      const sliderMin = r.minSF;
-      const sliderMax = Math.max(Math.round(r.defaultSF * 3), sliderMin + 200);
-      const sliderVal = Math.max(sliderMin, Math.min(sliderMax, Math.round(r.sf)));
-
-      const unheatedTag = r.conditioned ? "" :
-        " <span style=\"color:var(--ink-faint);font-size:11px;font-style:italic\">· unheated</span>";
-
-      tr.innerHTML =
-        "<td class=\"name\">" + r.name + unheatedTag + "</td>" +
-        "<td class=\"slider\"><input type=\"range\" min=\"" + sliderMin + "\" max=\"" + sliderMax + "\" step=\"1\" value=\"" + sliderVal + "\"></td>" +
-        "<td class=\"dim\">" + r.w.toFixed(1) + " &times; " + r.l.toFixed(1) + "</td>" +
-        "<td class=\"sf\">" + fmtSF(r.sf) + "</td>" +
-        "<td class=\"del\">" + (r.removable ? "<button class=\"del-btn\" data-del=\"" + r.id + "\" title=\"Remove\">&times;</button>" : "") + "</td>";
-
-      tbody.appendChild(tr);
-
-      const slider = tr.querySelector("input[type=range]");
-      slider.addEventListener("input", e => {
-        r.sf = +e.target.value;
-        computeDimensions(r);
-        tr.querySelector(".dim").innerHTML = r.w.toFixed(1) + " &times; " + r.l.toFixed(1);
-        tr.querySelector(".sf").textContent = fmtSF(r.sf);
-        renderSummary();
-      });
-    }
-  }
-
-  tbody.querySelectorAll("[data-del]").forEach(b => {
-    b.addEventListener("click", () => removeRoom(b.dataset.del));
-  });
+  renderRooms();
 }
 
 function renderSummary() {
   const t = totals();
-  document.getElementById("hcSF").textContent = fmtSF(t.hcSF);
-  document.getElementById("frSF").textContent = fmtSF(t.frSF);
 
-  // Tiers
+  document.getElementById("condGross").textContent = fmtSF(t.condGross);
+  document.getElementById("uplift").textContent    = fmtSF(t.uplift);
+  document.getElementById("hcNet").textContent     = fmtSF(t.hcNet);
+  document.getElementById("unc").textContent       = fmtSF(t.unc);
+  document.getElementById("urTotal").textContent   = fmtSF(t.urTotal);
+
+  // Material adjustments (depend on under-roof SF)
+  const adjs = materialAdjustments(t.urTotal);
+  let matSum = adjs.reduce((s, a) => s + a.dollars, 0);
+
+  // Tier table
   const tbody = document.getElementById("tiersBody");
   tbody.innerHTML = "";
   for (const key of ["normal","high","veryHigh"]) {
-    const t1 = TIERS[key];
-    const c = tierCost(key, t.hcSF);
-    const psfFr_lo = c.lo / Math.max(t.frSF, 1);
-    const psfFr_hi = c.hi / Math.max(t.frSF, 1);
+    const ti = TIERS[key];
+    const base = tierBaseRange(key, t.hcNet);
+    let totLo = base.lo + matSum;
+    let totHi = base.hi + matSum;
+    if (state.modifiers.steepLot) {
+      totLo *= (1 + STEEP_LOT_PCT);
+      totHi *= (1 + STEEP_LOT_PCT);
+    }
     const tr = document.createElement("tr");
     if (key === state.finishTier) tr.className = "selected";
     tr.innerHTML =
-      "<td class=\"tier-name\"><span class=\"selected-marker\"></span>" + t1.label +
-        "<span class=\"sub\">" + t1.sub + "</span></td>" +
-      "<td class=\"range\">" + fmt$M(c.lo) + "<span style=\"color:var(--ink-faint)\"> &ndash; </span>" + fmt$M(c.hi) + "</td>" +
-      "<td class=\"psf\">$" + t1.lo + "&ndash;$" + t1.hi + "</td>" +
-      "<td class=\"psf\">$" + Math.round(psfFr_lo) + "&ndash;$" + Math.round(psfFr_hi) + "</td>";
+      "<td class=\"tier-name\"><span class=\"selected-marker\"></span>" + ti.label +
+        "<span class=\"sub\">" + ti.sub + "</span></td>" +
+      "<td class=\"psf\">$" + ti.lo + "&ndash;$" + ti.hi + "</td>" +
+      "<td class=\"range\">" + fmt$M(base.lo) + " &ndash; " + fmt$M(base.hi) + "</td>" +
+      "<td class=\"total\">" + fmt$M(totLo) + " &ndash; " + fmt$M(totHi) + "</td>";
     tbody.appendChild(tr);
   }
 
-  // Material adjustments
-  const adjs = materialAdjustments(t.frSF);
-  const adjEl = document.getElementById("adjTable");
+  // Adjustments breakdown
+  const adjEl = document.getElementById("adjList");
   adjEl.innerHTML = "";
-  let adjSum = 0;
   for (const a of adjs) {
-    adjSum += a.dollars;
-    const tr = document.createElement("tr");
-    const cls = a.dollars === 0 ? "zero" : "";
-    const sign = a.dollars > 0 ? "+" : (a.dollars < 0 ? "−" : "");
-    const dollarStr = a.dollars === 0 ? "—" :
-      sign + "$" + Math.abs(Math.round(a.dollars)).toLocaleString();
-    tr.innerHTML =
-      "<td class=\"adj-label\">" + a.category +
-        " · <span style=\"color:var(--ink-faint);font-style:italic\">" + a.option + "</span></td>" +
-      "<td class=\"adj-val " + cls + "\">" + dollarStr + "</td>";
-    adjEl.appendChild(tr);
+    const div = document.createElement("div");
+    div.className = "adj-row";
+    const psfStr = (a.psf === 0 ? "baseline" : (a.psf > 0 ? "+" : "−") + "$" + Math.abs(a.psf) + "/sf");
+    div.innerHTML =
+      "<span class=\"k\">" + a.category + " · <em>" + a.option + "</em> " +
+        "<span style=\"color:var(--ink-faint);font-family:var(--mono);font-size:11px;font-style:normal\">(" + psfStr + " &times; " + fmtSF(t.urTotal) + " sf)</span></span>" +
+      "<span class=\"v" + (a.dollars === 0 ? " zero" : "") + "\">" + fmt$signed(a.dollars) + "</span>";
+    adjEl.appendChild(div);
   }
-  // Sum row
-  const trSum = document.createElement("tr");
-  trSum.style.borderTop = "1px solid var(--rule)";
-  const sumStr = adjSum === 0 ? "—" :
-    (adjSum > 0 ? "+" : "−") + "$" + Math.abs(Math.round(adjSum)).toLocaleString();
-  trSum.innerHTML =
-    "<td class=\"adj-label\" style=\"font-style:italic;color:var(--ink-mute);padding-top:6px;border-top:1px solid var(--rule)\">Net adjustment</td>" +
-    "<td class=\"adj-val\" style=\"padding-top:6px;border-top:1px solid var(--rule)\">" + sumStr + "</td>";
-  adjEl.appendChild(trSum);
+  // Sum
+  const sumDiv = document.createElement("div");
+  sumDiv.className = "adj-row sum";
+  sumDiv.innerHTML =
+    "<span class=\"k\">Net materials adjustment</span>" +
+    "<span class=\"v\">" + fmt$signed(matSum) + "</span>";
+  adjEl.appendChild(sumDiv);
 
-  // Per-cat hint
-  document.getElementById("wallDelta").textContent = adjLabel("walls",   t.frSF);
-  document.getElementById("roofDelta").textContent = adjLabel("roof",    t.frSF);
-  document.getElementById("winDelta").textContent  = adjLabel("windows", t.frSF);
+  // Steep lot (if active) — applied to selected tier total
+  const baseSel = tierBaseRange(state.finishTier, t.hcNet);
+  let totLoSel = baseSel.lo + matSum;
+  let totHiSel = baseSel.hi + matSum;
+  let lotLo = 0, lotHi = 0;
+  if (state.modifiers.steepLot) {
+    lotLo = totLoSel * STEEP_LOT_PCT;
+    lotHi = totHiSel * STEEP_LOT_PCT;
+    const lotDiv = document.createElement("div");
+    lotDiv.className = "adj-row";
+    lotDiv.innerHTML =
+      "<span class=\"k\">Steep lot &middot; <em>5% surcharge</em> " +
+        "<span style=\"color:var(--ink-faint);font-family:var(--mono);font-size:11px;font-style:normal\">(deeper foundation, retaining, site)</span></span>" +
+      "<span class=\"v\">+" + fmt$M(lotLo) + " &ndash; +" + fmt$M(lotHi) + "</span>";
+    adjEl.appendChild(lotDiv);
+    totLoSel += lotLo;
+    totHiSel += lotHi;
+  }
 
-  // Grand total
-  const sel = tierCost(state.finishTier, t.hcSF);
-  const lo = sel.lo + adjSum;
-  const hi = sel.hi + adjSum;
   document.getElementById("selTierName").textContent = TIERS[state.finishTier].label;
-  document.getElementById("grandTotal").innerHTML = fmt$M(lo) + "  &ndash;  " + fmt$M(hi);
+  document.getElementById("grandTotal").innerHTML = fmt$M(totLoSel) + "  &ndash;  " + fmt$M(totHiSel);
 }
 
-function adjLabel(cat, frSF) {
-  const opt = MATERIALS[cat].options[state.materials[cat]];
-  const d = opt.psf * frSF;
-  if (d === 0) return "baseline";
-  return (d > 0 ? "+" : "−") + "$" + Math.abs(Math.round(d)).toLocaleString();
+function renderRooms() {
+  const cont = document.getElementById("floorsContainer");
+  cont.innerHTML = "";
+
+  // Group rooms by floor
+  const byFloor = {};
+  for (const r of state.rooms) {
+    (byFloor[r.group] = byFloor[r.group] || []).push(r);
+  }
+
+  // Render each floor that has rooms or that is "always shown" (floor1, unheated)
+  for (const fdef of FLOOR_DEFS) {
+    const rooms = byFloor[fdef.id] || [];
+    // Skip floors with no rooms unless explicit (floor2 only if twoStory; basement only if basement)
+    if (!rooms.length && fdef.id === "floor2"   && !state.modifiers.twoStory) continue;
+    if (!rooms.length && fdef.id === "basement" && !state.modifiers.basement) continue;
+    if (!rooms.length && fdef.id !== "floor1" && fdef.id !== "unheated") continue;
+
+    const sec = document.createElement("div");
+    sec.className = "floor-section";
+
+    // Floor SF subtotal
+    let condSF = 0, uncSF = 0;
+    for (const r of rooms) {
+      const sf = r.w * r.l;
+      if (r.conditioned) condSF += sf; else uncSF += sf;
+    }
+    const total = condSF + uncSF;
+    const statTxt = fmtSF(total) + " sf gross" +
+      (condSF && uncSF ? "  ·  " + fmtSF(condSF) + " H&C" : "") +
+      (uncSF && !condSF ? "  ·  unconditioned" : "");
+
+    sec.innerHTML =
+      "<div class=\"floor-heading\">" +
+        "<span class=\"name\">" + fdef.name + "</span>" +
+        "<span class=\"stats\">" + statTxt + "</span>" +
+      "</div>" +
+      "<table class=\"rooms\"><thead><tr>" +
+        "<th>Space</th><th>Size</th><th class=\"num\">W &times; L</th>" +
+        "<th class=\"num\">SF</th><th></th>" +
+      "</tr></thead><tbody></tbody></table>";
+
+    const tbody = sec.querySelector("tbody");
+    for (const r of rooms) renderRoomRow(tbody, r);
+    cont.appendChild(sec);
+
+    // Add-row palette for this floor
+    if (ADD_PALETTE[fdef.id]) {
+      const addRow = document.createElement("div");
+      addRow.className = "add-row";
+      const opts = ADD_PALETTE[fdef.id].map(k => {
+        const tp = TPL[k];
+        return "<option value=\"" + k + "\">" + tp.name +
+          " (" + fmtFI(tp.w) + " &times; " + fmtFI(tp.l) + ")</option>";
+      }).join("");
+      addRow.innerHTML =
+        "<span>Add to " + fdef.name + ":</span>" +
+        "<select class=\"add-sel\" data-floor=\"" + fdef.id + "\">" + opts + "</select>" +
+        "<button class=\"add-btn\" data-floor=\"" + fdef.id + "\" type=\"button\">+ Add</button>";
+      sec.appendChild(addRow);
+    }
+  }
+
+  // Wire add buttons
+  cont.querySelectorAll(".add-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      const floor = b.dataset.floor;
+      const sel = b.parentElement.querySelector("select.add-sel");
+      addUserRoom(sel.value, floor);
+    });
+  });
 }
 
-/* Wire up controls */
+function renderRoomRow(tbody, r) {
+  const tr = document.createElement("tr");
+  tr.dataset.id = r.id;
+  if (r.fixed) tr.className = "fixed-row";
+
+  const sf = Math.round(r.w * r.l);
+
+  // Slider range based on default × {0.5...3} (clamped to mins)
+  const minSF = Math.max(r.minW * r.minL, 4);
+  const maxSF = Math.max(Math.round(r.defaultW * r.defaultL * 3), minSF + 200);
+
+  const unheatedTag = r.conditioned ? "" :
+    " <span style=\"color:var(--ink-faint);font-size:11px;font-style:italic\">· unheated</span>";
+
+  if (r.fixed) {
+    tr.innerHTML =
+      "<td class=\"name\">" + r.name + "<span class=\"fixed-tag\">fixed</span></td>" +
+      "<td class=\"slider\" style=\"color:var(--ink-faint);font-family:var(--sans);font-size:11px;font-style:italic\">switchback, 11&prime; floor-to-floor, 4&prime; landing</td>" +
+      "<td class=\"dim\">" + fmtFI(r.w) + " &times; " + fmtFI(r.l) + "</td>" +
+      "<td class=\"sf\">" + sf + "</td>" +
+      "<td class=\"del\"></td>";
+    tbody.appendChild(tr);
+    return;
+  }
+
+  tr.innerHTML =
+    "<td class=\"name\">" + r.name + unheatedTag + "</td>" +
+    "<td class=\"slider\"><input type=\"range\" min=\"" + minSF + "\" max=\"" + maxSF +
+      "\" step=\"1\" value=\"" + sf + "\"></td>" +
+    "<td class=\"dim\">" +
+      "<input type=\"text\" class=\"dim-input\" data-axis=\"w\" value=\"" + fmtFI(r.w) + "\">" +
+      "<span class=\"x-sep\">&times;</span>" +
+      "<input type=\"text\" class=\"dim-input\" data-axis=\"l\" value=\"" + fmtFI(r.l) + "\">" +
+    "</td>" +
+    "<td class=\"sf\">" + sf + "</td>" +
+    "<td class=\"del\">" + (r.removable ? "<button class=\"del-btn\" data-del=\"" + r.id + "\" title=\"Remove\">&times;</button>" : "") + "</td>";
+  tbody.appendChild(tr);
+
+  const slider = tr.querySelector("input[type=range]");
+  const wInput = tr.querySelector('input[data-axis="w"]');
+  const lInput = tr.querySelector('input[data-axis="l"]');
+  const sfCell = tr.querySelector(".sf");
+
+  function syncRoomDisplay() {
+    sfCell.textContent = Math.round(r.w * r.l);
+    wInput.value = fmtFI(r.w);
+    lInput.value = fmtFI(r.l);
+    slider.value = Math.round(r.w * r.l);
+    renderSummary();
+    // Update floor heading subtotal
+    const sec = tr.closest(".floor-section");
+    if (sec) updateFloorHeading(sec, r.group);
+  }
+
+  // Slider: scale W and L proportionally, snap to 6"
+  slider.addEventListener("input", e => {
+    const targetSF = +e.target.value;
+    const curSF = r.w * r.l;
+    if (curSF <= 0) return;
+    const scale = Math.sqrt(targetSF / curSF);
+    let newW = snap6(r.w * scale);
+    let newL = snap6(r.l * scale);
+    if (newW < r.minW) newW = r.minW;
+    if (newL < r.minL) newL = r.minL;
+    r.w = newW; r.l = newL;
+    syncRoomDisplay();
+  });
+
+  function commitDim(input, axis) {
+    const v = parseFI(input.value);
+    if (v == null || isNaN(v)) {
+      input.value = fmtFI(axis === "w" ? r.w : r.l);
+      return;
+    }
+    let snapped = snap6(v);
+    if (axis === "w" && snapped < r.minW) snapped = r.minW;
+    if (axis === "l" && snapped < r.minL) snapped = r.minL;
+    if (axis === "w") r.w = snapped; else r.l = snapped;
+    syncRoomDisplay();
+  }
+
+  wInput.addEventListener("change", () => commitDim(wInput, "w"));
+  wInput.addEventListener("blur",   () => commitDim(wInput, "w"));
+  wInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commitDim(wInput, "w"); } });
+  lInput.addEventListener("change", () => commitDim(lInput, "l"));
+  lInput.addEventListener("blur",   () => commitDim(lInput, "l"));
+  lInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commitDim(lInput, "l"); } });
+
+  // Delete
+  if (r.removable) {
+    tr.querySelector(".del-btn").addEventListener("click", () => removeRoom(r.id));
+  }
+}
+
+function updateFloorHeading(sectionEl, groupId) {
+  const rooms = state.rooms.filter(r => r.group === groupId);
+  let condSF = 0, uncSF = 0;
+  for (const r of rooms) {
+    const sf = r.w * r.l;
+    if (r.conditioned) condSF += sf; else uncSF += sf;
+  }
+  const total = condSF + uncSF;
+  const heading = sectionEl.querySelector(".floor-heading .stats");
+  if (!heading) return;
+  heading.textContent =
+    fmtSF(total) + " sf gross" +
+    (condSF && uncSF ? "  ·  " + fmtSF(condSF) + " H&C" : "") +
+    (uncSF && !condSF ? "  ·  unconditioned" : "");
+}
+
+/* ====================================================================
+   Wire controls
+   ==================================================================== */
 function wireControls() {
   document.getElementById("bedDown").addEventListener("click", () => {
     if (state.bedrooms > 1) { state.bedrooms--; buildRoomList(); render(); }
@@ -1041,8 +1125,7 @@ function wireControls() {
 
   document.querySelectorAll("#modChips .chip").forEach(chip => {
     const input = chip.querySelector("input");
-    chip.addEventListener("click", e => {
-      // The native checkbox toggles via label; defer state read.
+    chip.addEventListener("click", () => {
       setTimeout(() => {
         state.modifiers[input.dataset.mod] = input.checked;
         chip.classList.toggle("active", input.checked);
@@ -1073,12 +1156,6 @@ function wireControls() {
   }
   wireMatSeg("#wallSeg", "walls");
   wireMatSeg("#roofSeg", "roof");
-  wireMatSeg("#winSeg",  "windows");
-
-  document.getElementById("addRoomBtn").addEventListener("click", () => {
-    const sel = document.getElementById("addRoomSelect");
-    addUserRoom(sel.value);
-  });
 }
 
 /* Boot */
