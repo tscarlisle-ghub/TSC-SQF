@@ -49,6 +49,22 @@
     font-size: 28px; letter-spacing: -0.01em; margin: 0;
   }
   header.masthead h1 em { font-style: italic; color: var(--ink-mute); }
+  header.masthead .title-block { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  header.masthead .project-name-input {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    max-width: 540px;
+    padding: 2px 0 2px 0;
+    margin-top: 2px;
+  }
+  header.masthead .project-name-input::placeholder { color: var(--ink-faint); font-style: italic; }
+  header.masthead .project-name-input:focus { border-bottom: 1px solid var(--accent-mute); }
   header.masthead .firm {
     font-family: "trajan-sans-pro", "Trajan Pro", "Optima", "Palatino", serif;
     font-weight: 600;
@@ -566,7 +582,11 @@
 <div class="page">
 
   <header class="masthead">
-    <h1>Construction Cost Estimator <em>—  preliminary scope &amp; budget</em></h1>
+    <div class="title-block">
+      <h1>Construction Cost Estimator <em>—  preliminary scope &amp; budget</em></h1>
+      <input class="project-name-input" id="projectName" type="text"
+             placeholder="Project name (optional)…" maxlength="80" autocomplete="off">
+    </div>
     <span class="firm">Carlisle Moore Architects</span>
   </header>
 
@@ -674,6 +694,7 @@
   <!-- ===================== COST SUMMARY ===================== -->
   <h2 class="section">Cost Summary
     <span class="header-actions">
+      <button id="emailClientBtn"  type="button" class="export-btn" title="Open an email draft with this configuration's link">Email to client</button>
       <button id="shareLinkBtn"    type="button" class="export-btn" title="Copy a sharable link with this configuration">Copy share link</button>
       <button id="exportXlsxBtn"   type="button" class="export-btn" title="Export to Excel">Export to Excel</button>
       <button id="resetBtn"        type="button" class="export-btn" title="Reset to defaults">Reset</button>
@@ -919,6 +940,7 @@ const ADD_PALETTE = {
    State
    ==================================================================== */
 const state = {
+  projectName: "",          // optional client/project name shown in masthead
   bedrooms: 4,
   modifiers: { twoStory: false, basement: false, pool: false },
   steepSite:   "none",     // none / sloping / steep
@@ -1532,6 +1554,20 @@ function updateFloorHeading(sectionEl, groupId) {
    Wire controls
    ==================================================================== */
 function wireControls() {
+  // Project name input — saves on input + on blur
+  const pnInput = document.getElementById("projectName");
+  if (pnInput) {
+    pnInput.addEventListener("input", () => {
+      state.projectName = pnInput.value;
+      saveState();
+    });
+    pnInput.addEventListener("blur", () => {
+      state.projectName = pnInput.value.trim();
+      pnInput.value = state.projectName;
+      saveState();
+    });
+  }
+
   document.getElementById("bedDown").addEventListener("click", () => {
     if (state.bedrooms > 1) { state.bedrooms--; buildRoomList(); render(); saveState(); }
   });
@@ -1634,6 +1670,23 @@ function wireControls() {
     try { history.replaceState(null, "", location.pathname); } catch (e) {}
     location.reload();
   });
+  // Email-to-client — opens a mailto draft pre-filled with the share link
+  const emailBtn = document.getElementById("emailClientBtn");
+  if (emailBtn) emailBtn.addEventListener("click", () => {
+    syncStateToURL();
+    const url     = location.href;
+    const project = (state.projectName || "").trim();
+    const subject = (project ? project + " — " : "") + "Construction Cost Estimate · Carlisle Moore Architects";
+    const body =
+      (project ? "Hi,\n\nHere's a starting point for " + project + " you can play with — " : "Hi,\n\nHere's a starting point you can play with — ") +
+      "adjust the rooms, finishes, and overall scope to match what you have in mind. " +
+      "Whatever changes you make stick to the link, so feel free to send it back when you're ready to talk through it.\n\n" +
+      url + "\n\n" +
+      "— Scott\n" +
+      "Carlisle Moore Architects";
+    window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  });
+
   const shareBtn = document.getElementById("shareLinkBtn");
   if (shareBtn) shareBtn.addEventListener("click", async () => {
     syncStateToURL();
@@ -1662,6 +1715,8 @@ function wireControls() {
    Reflect state into the UI controls (used after loadState).
    ==================================================================== */
 function syncUIToState() {
+  const pn = document.getElementById("projectName");
+  if (pn && pn.value !== (state.projectName || "")) pn.value = state.projectName || "";
   document.getElementById("bedVal").textContent = state.bedrooms;
   // Modifier chips
   document.querySelectorAll("#modChips .chip").forEach(chip => {
@@ -1705,6 +1760,7 @@ function syncUIToState() {
 const STORAGE_KEY = "cma-cost-estimator-v1";
 function buildSnapshot() {
   return {
+    projectName: state.projectName || "",
     bedrooms: state.bedrooms,
     modifiers: state.modifiers,
     steepSite: state.steepSite,
@@ -1755,6 +1811,7 @@ function saveState() {
 }
 function applySnapshot(snap) {
   if (!snap || !snap.rooms) return false;
+  state.projectName = snap.projectName || "";
   state.bedrooms = snap.bedrooms ?? 4;
   state.modifiers = Object.assign({ twoStory: false, basement: false, pool: false }, snap.modifiers || {});
   state.steepSite  = snap.steepSite  || "none";
@@ -1875,6 +1932,13 @@ async function exportToExcel() {
     r = ws.addRow(["Carlisle Moore Architects"]);
     ws.mergeCells(`A${r.number}:G${r.number}`);
     r.getCell(1).font = F.sub;
+
+    if ((state.projectName || "").trim()) {
+      r = ws.addRow([state.projectName.trim()]);
+      ws.mergeCells(`A${r.number}:G${r.number}`);
+      r.getCell(1).font = { name: "Seaford", size: 14, italic: true, color: { argb: "FF1A1A1A" } };
+      r.height = 22;
+    }
     ws.addRow([]);
 
     // ---- 2.  HOUSE TYPE ----
